@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Setting;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class SettingController extends Controller
+{
+    /**
+     * Display the settings form.
+     */
+    public function index(): Response
+    {
+        $settings = Setting::pluck('value', 'key')->toArray();
+        $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos'];
+        
+        foreach ($jsonKeys as $k) {
+            if (isset($settings[$k])) {
+                $decoded = @json_decode($settings[$k], true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $settings[$k] = $decoded;
+                } else {
+                    $settings[$k] = $k === 'rental_requirements' ? ['tourist' => [], 'resident' => []] : [];
+                }
+            } else {
+                if ($k === 'rental_requirements') {
+                    $settings[$k] = ['tourist' => [], 'resident' => []];
+                } else if ($k === 'terms_and_conditions') {
+                    $settings[$k] = []; // Fallback for terms if it was old HTML string
+                } else {
+                    $settings[$k] = [];
+                }
+            }
+        }
+
+        return Inertia::render('admin/Settings', [
+            'settings' => $settings,
+        ]);
+    }
+
+    /**
+     * Update the settings in storage.
+     */
+    public function update(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'whatsapp_number' => ['required', 'string', 'max:255'],
+            'instagram_url' => ['nullable', 'url', 'max:255'],
+            'facebook_url' => ['nullable', 'url', 'max:255'],
+            'company_address' => ['required', 'string', 'max:1000'],
+            'company_email' => ['required', 'email', 'max:255'],
+            'terms_and_conditions' => ['nullable', 'array'],
+            'home_usps' => ['nullable', 'array'],
+            'home_services' => ['nullable', 'array'],
+            'rental_requirements' => ['nullable', 'array'],
+            'home_brand_logos' => ['nullable', 'array'],
+            'home_hero_title' => ['required', 'string', 'max:255'],
+            'home_hero_highlight' => ['required', 'string', 'max:255'],
+            'home_hero_subtitle' => ['required', 'string', 'max:1000'],
+            'rental_requirements_footer' => ['required', 'string', 'max:1000'],
+        ]);
+
+        foreach ($validated as $key => $value) {
+            $formattedValue = is_array($value) ? json_encode($value) : ($value ?? '');
+            
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $formattedValue]
+            );
+        }
+
+        return back()->with('success', 'Pengaturan website berhasil diperbarui.');
+    }
+}
