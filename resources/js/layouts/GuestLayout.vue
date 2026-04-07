@@ -34,16 +34,16 @@ const currentLang = ref('ID');
 
 function changeLanguage() {
     const newLang = currentLang.value === 'ID' ? 'id' : 'en';
-    const comboLang = newLang; // for direct translation setup
     
     // GTranslate hook if available
-    const gtranslateSelect = document.querySelector('.gtranslate_wrapper select');
-    if (gtranslateSelect && typeof Event === 'function') {
-        (gtranslateSelect as HTMLSelectElement).value = newLang;
-        gtranslateSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    if (typeof (window as any).doGTranslate === 'function') {
+        (window as any).doGTranslate(`id|${newLang}`);
     } else {
         // Fallback or custom logic
+        const domain = window.location.hostname;
         document.cookie = `googtrans=/id/${newLang}; path=/;`;
+        document.cookie = `googtrans=/id/${newLang}; path=/; domain=${domain};`;
+        document.cookie = `googtrans=/id/${newLang}; path=/; domain=.${domain};`;
         window.location.reload();
     }
 }
@@ -59,10 +59,11 @@ const navLinks = [
         <!-- Navbar -->
         <header
             class="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
-            :class="{
-                'glass border-b border-border/50 shadow-sm': scrolled,
-                'bg-transparent': !scrolled,
-            }"
+            :class="[
+                scrolled
+                    ? 'glass border-b border-border/50 shadow-sm'
+                    : 'bg-transparent',
+            ]"
         >
             <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <!-- Logo -->
@@ -220,11 +221,6 @@ const navLinks = [
                 <div class="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
                     &copy; {{ new Date().getFullYear() }} VINS BALI. All rights reserved.
                 </div>
-            </div>
-        </footer>
-    </div>
-</template>
-       </div>
             </div>
         </footer>
     </div>
