@@ -1,10 +1,3 @@
-Berikut adalah draf lengkap untuk file `README.md` yang disesuaikan dengan struktur proyek Laravel + Vue (Inertia.js) milik Vins Bali. Panduan ini mencakup deskripsi proyek, teknologi yang digunakan, serta langkah-langkah detail untuk instalasi di server (VPS) atau hosting.
-
-Kamu bisa menyalin teks di bawah ini dan menyimpannya sebagai file `README.md` di root folder proyek kamu.
-
-***
-
-```markdown
 # Vins Bali - Car Rental & Catalog System
 
 Vins Bali adalah aplikasi berbasis web yang digunakan untuk mengelola katalog mobil, kategori, layanan, dan pengaturan situs rental mobil. Sistem ini dibangun dengan tumpukan teknologi modern (TALL/VILT stack) untuk memberikan performa yang cepat dan antarmuka yang dinamis.
