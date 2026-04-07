@@ -59,11 +59,10 @@ const navLinks = [
         <!-- Navbar -->
         <header
             class="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
-            :class="[
-                scrolled
-                    ? 'glass border-b border-border/50 shadow-sm'
-                    : 'bg-transparent',
-            ]"
+            :class="{
+                'glass border-b border-border/50 shadow-sm': scrolled,
+                'bg-transparent': !scrolled,
+            }"
         >
             <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <!-- Logo -->
@@ -221,6 +220,11 @@ const navLinks = [
                 <div class="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
                     &copy; {{ new Date().getFullYear() }} VINS BALI. All rights reserved.
                 </div>
+            </div>
+        </footer>
+    </div>
+</template>
+       </div>
             </div>
         </footer>
     </div>
