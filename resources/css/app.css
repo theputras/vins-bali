@@ -208,13 +208,12 @@
 
 /* Hide Google Translate Banner and popup completely */
 .goog-te-banner-frame.skiptranslate,
-#goog-gt-tt, 
-.goog-tooltip, 
+#goog-gt-tt,
+.goog-tooltip,
 .goog-tooltip:hover,
 iframe.goog-te-banner-frame,
 iframe[name="goog_te_banner_frame"],
-iframe[id^="goog"],
-.gtranslate_wrapper {
+iframe[id^="goog"] {
     display: none !important;
 }
 .goog-text-highlight {

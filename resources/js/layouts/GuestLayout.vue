@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { Menu, X } from 'lucide-vue-next';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
-import { useCurrency } from '@/composables/useCurrency';
+import { useCurrency, loadStoredCurrency } from '@/composables/useCurrency';
 
 const page = usePage();
 const auth = computed(() => page.props.auth as { user: { role: string } | null });
@@ -12,41 +12,92 @@ const { currentCurrency } = useCurrency();
 
 const mobileMenuOpen = ref(false);
 const scrolled = ref(false);
+const currentLang = ref('ID');
+const currentYear = ref(new Date().getFullYear());
 
 function handleScroll() {
     scrolled.value = window.scrollY > 20;
 }
 
-onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll);
-});
-
-onMounted(() => {
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-
-    if (document.cookie.includes('googtrans=/id/en') || document.cookie.includes('googtrans=/auto/en')) {
-        currentLang.value = 'EN';
+// Detect language from cookies
+function detectLanguage() {
+    try {
+        console.log('Detecting language from cookies...');
+        const cookies = document.cookie;
+        console.log('Cookies:', cookies);
+        if (cookies.includes('googtrans=/id/en') || cookies.includes('googtrans=/auto/en')) {
+            currentLang.value = 'EN';
+            console.log('Detected: EN');
+        } else if (cookies.includes('googtrans=/id/id') || cookies.includes('googtrans=/auto/id')) {
+            currentLang.value = 'ID';
+            console.log('Detected: ID');
+        } else {
+            console.log('Using default: ID');
+        }
+    } catch (error) {
+        console.error('Error detecting language:', error);
     }
-});
+}
 
-const currentLang = ref('ID');
+// Wait for GTranslate to initialize
+function waitForGTranslate(callback: () => void, retries = 0) {
+    if (typeof (window as any).doGTranslate === 'function') {
+        console.log('GTranslate is ready');
+        callback();
+    } else if (retries < 20) {
+        if (retries === 0) {
+            console.log('Waiting for GTranslate to initialize...');
+        }
+        setTimeout(() => waitForGTranslate(callback, retries + 1), 300);
+    } else {
+        console.warn('GTranslate not loaded after 6 seconds, using fallback');
+        callback();
+    }
+}
 
 function changeLanguage() {
-    const newLang = currentLang.value === 'ID' ? 'id' : 'en';
-    
-    // GTranslate hook if available
-    if (typeof (window as any).doGTranslate === 'function') {
-        (window as any).doGTranslate(`id|${newLang}`);
-    } else {
-        // Fallback or custom logic
-        const domain = window.location.hostname;
-        document.cookie = `googtrans=/id/${newLang}; path=/;`;
-        document.cookie = `googtrans=/id/${newLang}; path=/; domain=${domain};`;
-        document.cookie = `googtrans=/id/${newLang}; path=/; domain=.${domain};`;
+    console.log('changeLanguage called, current:', currentLang.value);
+    try {
+        const newLang = currentLang.value === 'ID' ? 'en' : 'id';
+        console.log('Switching to:', newLang);
+
+        waitForGTranslate(() => {
+            if (typeof (window as any).doGTranslate === 'function') {
+                console.log('Using GTranslate API');
+                (window as any).doGTranslate(`id|${newLang}`);
+                setTimeout(() => {
+                    console.log('Reloading page...');
+                    window.location.reload();
+                }, 500);
+            } else {
+                console.log('Using fallback cookie method');
+                // Fallback: manually set cookies and reload
+                const domain = window.location.hostname;
+                const cookieValue = `/id/${newLang}`;
+                document.cookie = `googtrans=${cookieValue}; path=/;`;
+                document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
+                document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
+                window.location.reload();
+            }
+        });
+    } catch (error) {
+        console.error('Error changing language:', error);
         window.location.reload();
     }
 }
+
+onMounted(() => {
+    console.log('GuestLayout mounted');
+    window.addEventListener('scroll', handleScroll);
+    handleScroll();
+    detectLanguage();
+    currentYear.value = new Date().getFullYear();
+    loadStoredCurrency();
+});
+
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
 
 const navLinks = [
     { name: 'Home', href: '/' },
@@ -219,7 +270,7 @@ const navLinks = [
                 </div>
 
                 <div class="mt-10 border-t border-border pt-6 text-center text-xs text-muted-foreground">
-                    &copy; {{ new Date().getFullYear() }} VINS BALI. All rights reserved.
+                    &copy; {{ currentYear }} VINS BALI. All rights reserved.
                 </div>
             </div>
         </footer>
