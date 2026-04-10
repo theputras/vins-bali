@@ -30,35 +30,38 @@
         <x-inertia::app />
 
         @if(!request()->is('admin*'))
-        <!-- GTranslate Wrapper configuration -->
+        <!-- Google Translate -->
+        <div id="google_translate_element" style="display:none;"></div>
         <script>
-            window.gtranslateSettings = {
-                "default_language": "id",
-                "languages": ["id", "en", "ru", "de", "fr"],
-                "native_language_names": true,
-                "switcher_horizontal_position": "right",
-                "switcher_vertical_position": "bottom",
-                "float_switcher_open_direction": "top",
-                "flag_style": "2d"
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'id',
+                    includedLanguages: 'id,en,ru,de,fr',
+                    autoDisplay: false
+                }, 'google_translate_element');
             }
-            
-            // Read language from localStorage if available
+        </script>
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+        
+        <!-- Set language from localStorage -->
+        <script>
             try {
                 var storedLang = localStorage.getItem('vins_language');
                 if (storedLang) {
                     var langCode = storedLang.toLowerCase();
-                    console.log('[GTranslate] Loading language from localStorage:', storedLang);
+                    console.log('[GTranslate] Will translate to:', storedLang);
+                    
+                    // Set cookies
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/;';
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + window.location.hostname + ';';
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + window.location.hostname + ';';
                 } else {
-                    console.log('[GTranslate] No language stored, using default ID');
+                    console.log('[GTranslate] No language stored, default ID');
                 }
             } catch(e) {
                 console.error('[GTranslate] Error:', e);
             }
         </script>
-        <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
         @endif
     </body>
 </html>
