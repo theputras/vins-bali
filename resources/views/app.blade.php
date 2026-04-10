@@ -31,17 +31,19 @@
 
         @if(!request()->is('admin*'))
         <!-- Google Translate -->
-        <div id="google_translate_element" style="display:none;"></div>
+        <!-- <div id="google_translate_element" style="display:none;"></div> -->
         <script>
-            function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                    pageLanguage: 'id',
-                    includedLanguages: 'id,en,ru,de,fr',
-                    autoDisplay: false
-                }, 'google_translate_element');
+          window.gtranslateSettings = {                                                                                                        │
+            "default_language": "id",                                                                                                        │
+             "languages": ["id", "en", "ru", "de", "fr"],                                                                                     │
+                   "native_language_names": true,                                                                                                   │
+                  "switcher_horizontal_position": "right",                                                                                         │
+                  "switcher_vertical_position": "bottom",                                                                                          │
+         "float_switcher_open_direction": "top",                                                                                          │
+                            "flag_style": "2d"     
             }
         </script>
-        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
+        <!-- <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script> -->
         
         <!-- Set language from localStorage -->
         <script>
@@ -62,6 +64,7 @@
                 console.error('[GTranslate] Error:', e);
             }
         </script>
+        <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>   
         @endif
     </body>
 </html>
