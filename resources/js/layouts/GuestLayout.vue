@@ -66,7 +66,7 @@ function changeLanguage() {
         // Determine target language (opposite of current)
         const targetLang = currentLang.value === 'ID' ? 'EN' : 'ID';
         const targetLangLower = targetLang.toLowerCase();
-        console.log('[Lang] Switching to:', targetLang);
+        console.log('[Lang] Target language:', targetLang);
 
         // Store in localStorage
         localStorage.setItem('vins_language', targetLang);
@@ -82,7 +82,9 @@ function changeLanguage() {
         document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
         document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
         
-        console.log('[Lang] Cookies set, reloading in 500ms...');
+        console.log('[Lang] Cookie value set to:', cookieValue);
+        console.log('[Lang] Current cookies:', document.cookie.substring(0, 150));
+        console.log('[Lang] Reloading in 500ms...');
         
         // Small delay to ensure cookies are saved
         setTimeout(() => {
