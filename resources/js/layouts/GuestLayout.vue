@@ -24,11 +24,10 @@ function detectLanguage() {
     try {
         console.log('Detecting language from cookies...');
         const cookies = document.cookie;
-        console.log('Cookies:', cookies);
-        if (cookies.includes('googtrans=/id/en') || cookies.includes('googtrans=/auto/en')) {
+        if (cookies.includes('googtrans=/auto/en') || cookies.includes('googtrans=/id/en')) {
             currentLang.value = 'EN';
             console.log('Detected: EN');
-        } else if (cookies.includes('googtrans=/id/id') || cookies.includes('googtrans=/auto/id')) {
+        } else if (cookies.includes('googtrans=/auto/id') || cookies.includes('googtrans=/id/id')) {
             currentLang.value = 'ID';
             console.log('Detected: ID');
         } else {
@@ -39,47 +38,27 @@ function detectLanguage() {
     }
 }
 
-// Wait for GTranslate to initialize
-function waitForGTranslate(callback: () => void, retries = 0) {
-    if (typeof (window as any).doGTranslate === 'function') {
-        console.log('GTranslate is ready');
-        callback();
-    } else if (retries < 20) {
-        if (retries === 0) {
-            console.log('Waiting for GTranslate to initialize...');
-        }
-        setTimeout(() => waitForGTranslate(callback, retries + 1), 300);
-    } else {
-        console.warn('GTranslate not loaded after 6 seconds, using fallback');
-        callback();
-    }
-}
-
 function changeLanguage() {
     console.log('changeLanguage called, current:', currentLang.value);
     try {
         const newLang = currentLang.value === 'ID' ? 'en' : 'id';
         console.log('Switching to:', newLang);
 
-        waitForGTranslate(() => {
-            if (typeof (window as any).doGTranslate === 'function') {
-                console.log('Using GTranslate API');
-                (window as any).doGTranslate(`id|${newLang}`);
-                setTimeout(() => {
-                    console.log('Reloading page...');
-                    window.location.reload();
-                }, 500);
-            } else {
-                console.log('Using fallback cookie method');
-                // Fallback: manually set cookies and reload
-                const domain = window.location.hostname;
-                const cookieValue = `/id/${newLang}`;
-                document.cookie = `googtrans=${cookieValue}; path=/;`;
-                document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
-                document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
-                window.location.reload();
-            }
-        });
+        // Set GTranslate cookies with proper paths and domains
+        const cookieValue = `/auto/${newLang}`;
+        const domain = window.location.hostname;
+        
+        // Set cookies for all possible variations
+        document.cookie = `googtrans=${cookieValue}; path=/;`;
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
+        
+        console.log('Cookies set, reloading page...');
+        
+        // Reload to apply translation
+        setTimeout(() => {
+            window.location.reload();
+        }, 300);
     } catch (error) {
         console.error('Error changing language:', error);
         window.location.reload();
