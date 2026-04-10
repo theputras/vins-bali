@@ -13,6 +13,7 @@ const { currentCurrency } = useCurrency();
 const mobileMenuOpen = ref(false);
 const scrolled = ref(false);
 const currentLang = ref('ID');
+const isChangingLang = ref(false); // Prevent multiple rapid changes
 const currentYear = ref(new Date().getFullYear());
 
 function handleScroll() {
@@ -22,57 +23,74 @@ function handleScroll() {
 // Detect language from cookies or localStorage
 function detectLanguage() {
     try {
-        console.log('Detecting language from cookies/localStorage...');
+        console.log('[Lang] Detecting language...');
         
-        // Check localStorage first (more reliable)
+        // Check localStorage first (most reliable)
         const storedLang = localStorage.getItem('vins_language');
         if (storedLang) {
             currentLang.value = storedLang;
-            console.log('Detected from localStorage:', storedLang);
+            console.log('[Lang] From localStorage:', storedLang);
             return;
         }
         
         // Fallback to cookie detection
         const cookies = document.cookie;
+        console.log('[Lang] Cookies:', cookies.substring(0, 100));
+        
         if (cookies.includes('googtrans=/auto/en') || cookies.includes('googtrans=/id/en')) {
             currentLang.value = 'EN';
-            console.log('Detected from cookies: EN');
+            console.log('[Lang] From cookies: EN');
         } else if (cookies.includes('googtrans=/auto/id') || cookies.includes('googtrans=/id/id')) {
             currentLang.value = 'ID';
-            console.log('Detected from cookies: ID');
+            console.log('[Lang] From cookies: ID');
         } else {
-            console.log('Using default: ID');
+            currentLang.value = 'ID';
+            console.log('[Lang] Using default: ID');
         }
     } catch (error) {
-        console.error('Error detecting language:', error);
+        console.error('[Lang] Error detecting:', error);
+        currentLang.value = 'ID';
     }
 }
 
 function changeLanguage() {
-    console.log('changeLanguage called, current:', currentLang.value);
+    if (isChangingLang.value) {
+        console.log('[Lang] Change already in progress, skipping...');
+        return;
+    }
+    
+    console.log('[Lang] changeLanguage called, currentLang:', currentLang.value);
+    isChangingLang.value = true;
+    
     try {
-        const newLang = currentLang.value === 'ID' ? 'en' : 'id';
-        const newLangUpper = newLang.toUpperCase();
-        console.log('Switching to:', newLangUpper);
+        // Determine target language (opposite of current)
+        const targetLang = currentLang.value === 'ID' ? 'EN' : 'ID';
+        const targetLangLower = targetLang.toLowerCase();
+        console.log('[Lang] Switching to:', targetLang);
 
-        // Store in localStorage for persistence
-        localStorage.setItem('vins_language', newLangUpper);
+        // Store in localStorage
+        localStorage.setItem('vins_language', targetLang);
+        console.log('[Lang] Stored in localStorage:', targetLang);
         
-        // Set GTranslate cookies
-        const cookieValue = `/auto/${newLang}`;
+        // Set GTranslate cookies with proper format
+        const cookieValue = `/auto/${targetLangLower}`;
         const domain = window.location.hostname;
+        const expires = 'expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
         
-        // Set cookies with different scopes
-        document.cookie = `googtrans=${cookieValue}; path=/;`;
-        document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
-        document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
+        // Set cookies with different scopes and long expiry
+        document.cookie = `googtrans=${cookieValue}; path=/; ${expires}; SameSite=Lax`;
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
+        document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
         
-        console.log('Language stored and cookies set, reloading...');
+        console.log('[Lang] Cookies set, reloading in 500ms...');
         
-        // Reload to apply translation
-        window.location.reload();
+        // Small delay to ensure cookies are saved
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
     } catch (error) {
-        console.error('Error changing language:', error);
+        console.error('[Lang] Error:', error);
+        isChangingLang.value = false;
         window.location.reload();
     }
 }
@@ -138,7 +156,7 @@ const navLinks = [
 
                     <!-- Language Dropdown -->
                     <select
-                        v-model="currentLang"
+                        :value="currentLang"
                         @change="changeLanguage"
                         class="h-9 cursor-pointer rounded-md border border-input bg-background px-3 py-1 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-1 focus:ring-ring dark:bg-input/30 dark:hover:bg-input/50"
                     >
@@ -159,7 +177,7 @@ const navLinks = [
                     </select>
 
                     <select
-                        v-model="currentLang"
+                        :value="currentLang"
                         @change="changeLanguage"
                         class="h-9 rounded-md border border-input bg-background px-2.5 py-1 text-xs font-semibold focus:outline-none"
                     >

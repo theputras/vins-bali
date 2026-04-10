@@ -47,11 +47,16 @@
                 var storedLang = localStorage.getItem('vins_language');
                 if (storedLang) {
                     var langCode = storedLang.toLowerCase();
+                    console.log('[GTranslate] Loading language from localStorage:', storedLang);
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/;';
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + window.location.hostname + ';';
                     document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + window.location.hostname + ';';
+                } else {
+                    console.log('[GTranslate] No language stored, using default ID');
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('[GTranslate] Error:', e);
+            }
         </script>
         <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
         @endif
