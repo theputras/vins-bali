@@ -19,17 +19,27 @@ function handleScroll() {
     scrolled.value = window.scrollY > 20;
 }
 
-// Detect language from cookies
+// Detect language from cookies or localStorage
 function detectLanguage() {
     try {
-        console.log('Detecting language from cookies...');
+        console.log('Detecting language from cookies/localStorage...');
+        
+        // Check localStorage first (more reliable)
+        const storedLang = localStorage.getItem('vins_language');
+        if (storedLang) {
+            currentLang.value = storedLang;
+            console.log('Detected from localStorage:', storedLang);
+            return;
+        }
+        
+        // Fallback to cookie detection
         const cookies = document.cookie;
         if (cookies.includes('googtrans=/auto/en') || cookies.includes('googtrans=/id/en')) {
             currentLang.value = 'EN';
-            console.log('Detected: EN');
+            console.log('Detected from cookies: EN');
         } else if (cookies.includes('googtrans=/auto/id') || cookies.includes('googtrans=/id/id')) {
             currentLang.value = 'ID';
-            console.log('Detected: ID');
+            console.log('Detected from cookies: ID');
         } else {
             console.log('Using default: ID');
         }
@@ -42,23 +52,25 @@ function changeLanguage() {
     console.log('changeLanguage called, current:', currentLang.value);
     try {
         const newLang = currentLang.value === 'ID' ? 'en' : 'id';
-        console.log('Switching to:', newLang);
+        const newLangUpper = newLang.toUpperCase();
+        console.log('Switching to:', newLangUpper);
 
-        // Set GTranslate cookies with proper paths and domains
+        // Store in localStorage for persistence
+        localStorage.setItem('vins_language', newLangUpper);
+        
+        // Set GTranslate cookies
         const cookieValue = `/auto/${newLang}`;
         const domain = window.location.hostname;
         
-        // Set cookies for all possible variations
+        // Set cookies with different scopes
         document.cookie = `googtrans=${cookieValue}; path=/;`;
         document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
         document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
         
-        console.log('Cookies set, reloading page...');
+        console.log('Language stored and cookies set, reloading...');
         
         // Reload to apply translation
-        setTimeout(() => {
-            window.location.reload();
-        }, 300);
+        window.location.reload();
     } catch (error) {
         console.error('Error changing language:', error);
         window.location.reload();

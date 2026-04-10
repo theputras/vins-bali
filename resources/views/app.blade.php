@@ -41,6 +41,19 @@
                 "float_switcher_open_direction": "top",
                 "flag_style": "2d"
             }
+            
+            // Read language from localStorage if available
+            (function() {
+                try {
+                    const storedLang = localStorage.getItem('vins_language');
+                    if (storedLang) {
+                        const langCode = storedLang.toLowerCase();
+                        document.cookie = `googtrans=/auto/${langCode}; path=/;`;
+                        document.cookie = `googtrans=/auto/${langCode}; path=/; domain=${window.location.hostname};`;
+                        document.cookie = `googtrans=/auto/${langCode}; path=/; domain=.${window.location.hostname};`;
+                    }
+                } catch(e) {}
+            })();
         </script>
         <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>
         @endif
