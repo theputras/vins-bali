@@ -140,7 +140,7 @@ function openTermsModal() {
                         </h1>
                     </div>
 
-                    <!-- Gallery -->2
+                    <!-- Gallery -->
                     <CarGallery
                         :images="car.images ?? []"
                         :car-name="car.name"
