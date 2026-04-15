@@ -36,17 +36,24 @@
             // 1) Set cookies BEFORE loading the translate script
             (function() {
                 try {
+                    var hostname = window.location.hostname;
+                    var parts = hostname.split('.');
+                    var rootDomain = parts.length > 2 ? parts.slice(-2).join('.') : hostname;
+
                     var storedLang = localStorage.getItem('vins_language');
                     if (storedLang && storedLang !== 'ID') {
                         var langCode = storedLang.toLowerCase();
                         document.cookie = 'googtrans=/auto/' + langCode + '; path=/;';
-                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + window.location.hostname + ';';
-                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + window.location.hostname + ';';
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + hostname + ';';
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + hostname + ';';
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + rootDomain + ';';
                     } else {
-                        // Clear any stale googtrans cookies when language is ID
-                        document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                        document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-                        document.cookie = 'googtrans=; path=/; domain=.' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+                        // Nuke ALL googtrans cookies on every domain variation
+                        var expiry = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                        document.cookie = 'googtrans=; path=/; ' + expiry + ';';
+                        document.cookie = 'googtrans=; path=/; domain=' + hostname + '; ' + expiry + ';';
+                        document.cookie = 'googtrans=; path=/; domain=.' + hostname + '; ' + expiry + ';';
+                        document.cookie = 'googtrans=; path=/; domain=.' + rootDomain + '; ' + expiry + ';';
                     }
                 } catch(e) {}
             })();
@@ -59,26 +66,25 @@
                     autoDisplay: false
                 }, 'google_translate_element');
 
-                // After init, programmatically trigger translation if needed
                 var storedLang = localStorage.getItem('vins_language');
-                if (storedLang && storedLang === 'EN') {
-                    var attempts = 0;
-                    var triggerInterval = setInterval(function() {
-                        attempts++;
-                        var combo = document.querySelector('.goog-te-combo');
-                        if (combo) {
+                var attempts = 0;
+                var triggerInterval = setInterval(function() {
+                    attempts++;
+                    var combo = document.querySelector('.goog-te-combo');
+                    if (combo) {
+                        if (storedLang === 'EN') {
+                            // Translate to English
                             combo.value = 'en';
-                            combo.dispatchEvent(new Event('change'));
-                            clearInterval(triggerInterval);
-                            // Hide widgets AFTER translation is triggered
-                            setTimeout(hideAllTranslateWidgets, 1000);
+                        } else {
+                            // Reset to original Indonesian
+                            combo.value = 'id';
                         }
-                        if (attempts > 50) clearInterval(triggerInterval); // 5s timeout
-                    }, 100);
-                } else {
-                    // No translation needed, hide widgets immediately
-                    setTimeout(hideAllTranslateWidgets, 500);
-                }
+                        combo.dispatchEvent(new Event('change'));
+                        clearInterval(triggerInterval);
+                        setTimeout(hideAllTranslateWidgets, 1000);
+                    }
+                    if (attempts > 50) clearInterval(triggerInterval);
+                }, 100);
             }
 
             // 3) Function to hide all Google Translate UI elements
