@@ -101,7 +101,12 @@ const termsAndConditions = computed<string[]>(() => {
     return Array.isArray(data) ? data : [];
 });
 
-const activeTab = ref<'specifications' | 'rental_conditions' | 'terms'>('specifications');
+const usps = computed(() => {
+    const data = page.props.global_settings?.home_usps;
+    return Array.isArray(data) ? data : [];
+});
+
+const activeTab = ref<'specifications' | 'terms'>('specifications');
 
 function openTermsModal() {
     agreedToTerms.value = false;
@@ -141,15 +146,8 @@ function openTermsModal() {
                             Specifications
                         </button>
                         <button 
-                            @click="activeTab = 'rental_conditions'"
-                            class="flex-1 whitespace-nowrap border-l border-r border-border px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
-                            :class="activeTab === 'rental_conditions' ? 'bg-[#3bb1b8] text-white' : 'text-muted-foreground hover:bg-muted/40'"
-                        >
-                            Rental Conditions
-                        </button>
-                        <button 
                             @click="activeTab = 'terms'"
-                            class="flex-1 whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
+                            class="flex-1 whitespace-nowrap border-l border-border px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
                             :class="activeTab === 'terms' ? 'bg-[#3bb1b8] text-white' : 'text-muted-foreground hover:bg-muted/40'"
                         >
                             Terms of Rental
@@ -175,27 +173,7 @@ function openTermsModal() {
                         </div>
 
                         <!-- Rental Conditions Tab -->
-                        <div v-show="activeTab === 'rental_conditions'" class="animate-fade-in">
-                            <h3 class="mb-6 text-xl font-bold tracking-tight text-foreground">Kondisi Sewa</h3>
-                            <ul class="space-y-4 text-sm text-foreground/90">
-                                <li class="flex items-start gap-3">
-                                    <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#3bb1b8]" />
-                                    <span><strong>Deposit:</strong> Kami menerapkan kebijakan tanpa deposit (No Deposit) untuk memudahkan proses. Cukup sertakan dokumen yang valid.</span>
-                                </li>
-                                <li class="flex items-start gap-3">
-                                    <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#3bb1b8]" />
-                                    <span><strong>Insurance:</strong> Asuransi dasar terekam secara otomatis. Perlindungan dari kecelakaan ringan (CDW) bisa diajukan senilai IDR 150k/hari.</span>
-                                </li>
-                                <li class="flex items-start gap-3">
-                                    <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#3bb1b8]" />
-                                    <span><strong>Mileage:</strong> Batas jarak tempuh harian hingga 250km per-hari. Kelebihan penggunaan (Extra Mileage) dikenakan tarif Rp 2.500/km.</span>
-                                </li>
-                                <li class="flex items-start gap-3">
-                                    <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#3bb1b8]" />
-                                    <span><strong>Fuel:</strong> Kendaraan akan diserahkan dengan bensin full atau sesuai kesepakatan awal, dan dikembalikan pada posisi yang sama.</span>
-                                </li>
-                            </ul>
-                        </div>
+
 
                         <!-- Terms of Rental Tab -->
                         <div v-show="activeTab === 'terms'" class="animate-fade-in">
@@ -272,6 +250,16 @@ function openTermsModal() {
                             <p class="mt-3 text-center text-[11px] text-muted-foreground">
                                 Tim VIP kami akan merespon via WhatsApp secara instan
                             </p>
+                        </div>
+
+                        <!-- USP Card -->
+                        <div class="rounded-xl border border-[#3bb1b8]/30 bg-card p-5">
+                            <ul class="space-y-4">
+                                <li v-for="(usp, index) in usps" :key="index" class="flex items-center gap-3">
+                                    <CheckCircle class="size-5 shrink-0 text-[#3bb1b8]" />
+                                    <span class="text-sm font-medium text-foreground">{{ usp }}</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
