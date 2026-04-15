@@ -117,7 +117,7 @@ function brandLogoUrl(slug: string) {
             <div class="mt-8 flex animate-slide-up flex-wrap items-center justify-center gap-4 animation-delay-400">
                 <Link href="#fleet">
                     <Button size="lg" class="bg-red-700 text-white hover:bg-red-800 gap-2 px-8 py-6 text-lg">
-                        Eksplorasi Armanda
+                        Booking Sekarang
                         <ArrowRight class="size-5" />
                     </Button>
                 </Link>

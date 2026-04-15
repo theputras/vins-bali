@@ -42,27 +42,33 @@ function detectLanguage() {
     }
 }
 
-function changeLanguage() {
+function changeLanguage(event: Event) {
     if (isChangingLang.value) return;
     isChangingLang.value = true;
     
     try {
-        const targetLang = currentLang.value === 'ID' ? 'EN' : 'ID';
-        const targetLangLower = targetLang.toLowerCase();
+        const select = event.target as HTMLSelectElement;
+        const targetLang = select.value; // 'ID' or 'EN'
 
         // Store in localStorage
         localStorage.setItem('vins_language', targetLang);
         
-        // Set Google Translate cookies
-        const cookieValue = `/auto/${targetLangLower}`;
         const domain = window.location.hostname;
         const expires = 'expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+
+        if (targetLang === 'EN') {
+            // Translate to English
+            const cookieValue = '/auto/en';
+            document.cookie = `googtrans=${cookieValue}; path=/; ${expires}; SameSite=Lax`;
+            document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
+            document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
+        } else {
+            // Back to original (Indonesian) — clear googtrans cookie
+            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+            document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+            document.cookie = `googtrans=; path=/; domain=.${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+        }
         
-        document.cookie = `googtrans=${cookieValue}; path=/; ${expires}; SameSite=Lax`;
-        document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
-        document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
-        
-        // Small delay to ensure cookies are saved before reload
         setTimeout(() => {
             window.location.reload();
         }, 300);
