@@ -141,14 +141,14 @@ function openTermsModal() {
                         <button 
                             @click="activeTab = 'specifications'"
                             class="flex-1 whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
-                            :class="activeTab === 'specifications' ? 'bg-[#3bb1b8] text-white' : 'text-muted-foreground hover:bg-muted/40'"
+                            :class="activeTab === 'specifications' ? 'bg-[#9f0306] text-white' : 'text-muted-foreground hover:bg-muted/40'"
                         >
                             Specifications
                         </button>
                         <button 
                             @click="activeTab = 'terms'"
                             class="flex-1 whitespace-nowrap border-l border-border px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
-                            :class="activeTab === 'terms' ? 'bg-[#3bb1b8] text-white' : 'text-muted-foreground hover:bg-muted/40'"
+                            :class="activeTab === 'terms' ? 'bg-[#9f0306] text-white' : 'text-muted-foreground hover:bg-muted/40'"
                         >
                             Terms of Rental
                         </button>
@@ -178,7 +178,7 @@ function openTermsModal() {
                         <!-- Terms of Rental Tab -->
                         <div v-show="activeTab === 'terms'" class="animate-fade-in">
                             <div class="flex items-center gap-3 mb-6">
-                                <FileText class="size-6 text-[#3bb1b8]" />
+                                <FileText class="size-6 text-[#9f0306]" />
                                 <h3 class="text-xl font-bold tracking-tight text-foreground">Syarat & Ketentuan Detail</h3>
                             </div>
                             
@@ -189,7 +189,7 @@ function openTermsModal() {
                                         :key="index"
                                         class="flex items-start gap-3 text-sm text-foreground/90 bg-muted/20 p-3 rounded-lg border border-border/50"
                                     >
-                                        <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#3bb1b8]" />
+                                        <CheckCircle class="mt-0.5 size-4 shrink-0 text-[#9f0306]" />
                                         <span>{{ term }}</span>
                                     </li>
                                 </ul>
@@ -253,10 +253,10 @@ function openTermsModal() {
                         </div>
 
                         <!-- USP Card -->
-                        <div class="rounded-xl border border-[#3bb1b8]/30 bg-card p-5">
+                        <div class="rounded-xl border border-[#9f0306]/30 bg-card p-5">
                             <ul class="space-y-4">
                                 <li v-for="(usp, index) in usps" :key="index" class="flex items-center gap-3">
-                                    <CheckCircle class="size-5 shrink-0 text-[#3bb1b8]" />
+                                    <CheckCircle class="size-5 shrink-0 text-[#9f0306]" />
                                     <span class="text-sm font-medium text-foreground">{{ usp }}</span>
                                 </li>
                             </ul>
