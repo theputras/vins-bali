@@ -10,6 +10,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 const props = defineProps<{
     featuredCars: Car[];
     heroImages: string[];
+    categories: string[];
 }>();
 
 const page = usePage();
@@ -30,8 +31,8 @@ onUnmounted(() => {
     if (slideInterval) clearInterval(slideInterval);
 });
 
-// Categories mock
-const popularCategories = ['Semua', 'Sports', 'SUV', 'Premium', 'Electric', 'Convertible'];
+// Categories from database
+const popularCategories = computed(() => ['Semua', ...props.categories]);
 const activeCategory = ref('Semua');
 
 // Filter featured cars by active category if it's set

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\CarCategory;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,9 +28,12 @@ class HomeController extends Controller
             ->map(fn ($img) => \Illuminate\Support\Facades\Storage::url($img->image_path))
             ->toArray();
 
+        $categories = CarCategory::orderBy('name')->pluck('name')->toArray();
+
         return Inertia::render('Home', [
             'featuredCars' => $featuredCars,
             'heroImages' => $heroImages,
+            'categories' => $categories,
         ]);
     }
 }
