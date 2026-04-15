@@ -127,9 +127,9 @@ function openTermsModal() {
                 Kembali ke Katalog
             </Link>
 
-            <div class="grid gap-8 lg:grid-cols-5 pb-24 lg:pb-0">
+            <div class="flex flex-col gap-8 lg:grid lg:grid-cols-5 pb-24 lg:pb-0">
                 <!-- Left Column (Gallery + Tabs) -->
-                <div class="lg:col-span-3 space-y-8">
+                <div class="order-2 lg:order-1 lg:col-span-3 space-y-8">
                     <!-- Gallery -->
                     <CarGallery
                         :images="car.images ?? []"
@@ -206,7 +206,7 @@ function openTermsModal() {
                 </div>
 
                 <!-- Right Column (Info & Booking) — entire panel sticky on desktop like Trinity -->
-                <div class="lg:col-span-2">
+                <div class="order-1 lg:order-2 lg:col-span-2">
                     <div class="lg:sticky lg:top-24 space-y-6">
                         <div>
                             <!-- Brand badge -->
