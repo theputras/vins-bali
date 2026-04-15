@@ -104,7 +104,7 @@ function submit() {
 
     if (props.isEditing && props.car) {
         // For PUT with files, use POST with _method override
-        router.post(`/admin/cars/${props.car.id}`, {
+        router.post(`/vbpanel/cars/${props.car.id}`, {
             _method: 'put',
             ...data,
             services: filteredServices,
@@ -119,7 +119,7 @@ function submit() {
             services: filteredServices,
         }));
         
-        transformedForm.post('/admin/cars', {
+        transformedForm.post('/vbpanel/cars', {
             forceFormData: true,
             preserveScroll: true,
         });
@@ -128,14 +128,14 @@ function submit() {
 
 // Delete existing image
 function deleteImage(imageId: number) {
-    router.delete(`/admin/car-images/${imageId}`, {
+    router.delete(`/vbpanel/car-images/${imageId}`, {
         preserveScroll: true,
     });
 }
 
 // Set primary image
 function setPrimary(imageId: number) {
-    router.patch(`/admin/car-images/${imageId}/set-primary`, {}, {
+    router.patch(`/vbpanel/car-images/${imageId}/set-primary`, {}, {
         preserveScroll: true,
     });
 }
@@ -150,7 +150,7 @@ const pageTitle = computed(() => props.isEditing ? `Edit: ${props.car?.name}` : 
     <div class="flex flex-col gap-6 p-4">
         <!-- Header -->
         <div>
-            <Link href="/admin/cars" class="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <Link href="/vbpanel/cars" class="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
                 <ArrowLeft class="size-4" />
                 Kembali
             </Link>
@@ -583,7 +583,7 @@ const pageTitle = computed(() => props.isEditing ? `Edit: ${props.car?.name}` : 
                         >
                             {{ form.processing ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Tambah Mobil' }}
                         </Button>
-                        <Link href="/admin/cars" class="block">
+                        <Link href="/vbpanel/cars" class="block">
                             <Button variant="outline" class="w-full" type="button">
                                 Batal
                             </Button>

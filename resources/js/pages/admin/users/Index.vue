@@ -60,7 +60,7 @@ function applyFilters() {
     if (search.value) params.search = search.value;
     if (roleFilter.value) params.role = roleFilter.value;
 
-    router.get('/admin/users', params, {
+    router.get('/vbpanel/users', params, {
         preserveState: true,
         preserveScroll: true,
     });
@@ -77,13 +77,13 @@ function onSearchInput() {
 }
 
 function toggleRole(user: UserData) {
-    router.patch(`/admin/users/${user.id}/toggle-role`, {}, {
+    router.patch(`/vbpanel/users/${user.id}/toggle-role`, {}, {
         preserveScroll: true,
     });
 }
 
 function deleteUser(user: UserData) {
-    router.delete(`/admin/users/${user.id}`, {
+    router.delete(`/vbpanel/users/${user.id}`, {
         preserveScroll: true,
     });
 }
@@ -124,7 +124,7 @@ const statCards = [
                 <h1 class="text-2xl font-bold tracking-tight text-foreground">Manajemen User</h1>
                 <p class="text-sm text-muted-foreground">Kelola akun pengguna dan admin</p>
             </div>
-            <Link href="/admin/users/create">
+            <Link href="/vbpanel/users/create">
                 <Button class="gap-2">
                     <Plus class="size-4" />
                     Tambah User
@@ -255,7 +255,7 @@ const statCards = [
                                 <!-- Actions -->
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-end gap-1">
-                                        <Link :href="`/admin/users/${user.id}/edit`">
+                                        <Link :href="`/vbpanel/users/${user.id}/edit`">
                                             <Button variant="ghost" size="icon-sm" title="Edit">
                                                 <Edit class="size-4" />
                                             </Button>

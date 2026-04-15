@@ -26,45 +26,147 @@
             <title>{{ config('app.name', 'Laravel') }}</title>
         </x-inertia::head>
     </head>
-    <body class="font-sans antialiased {{ request()->is('admin*') ? 'notranslate' : '' }}">
+    <body class="font-sans antialiased {{ request()->is('vbpanel*') ? 'notranslate' : '' }}">
         <x-inertia::app />
 
-        @if(!request()->is('admin*'))
-        <!-- Google Translate -->
-        <!-- <div id="google_translate_element" style="display:none;"></div> -->
+        @if(!request()->is('vbpanel*'))
+        <!-- Google Translate (widget UI hidden, translation functionality only) -->
+        <div id="google_translate_element" style="visibility:hidden!important;height:0!important;width:0!important;overflow:hidden!important;position:fixed!important;top:-9999px!important;left:-9999px!important;"></div>
         <script>
-          window.gtranslateSettings = {                                                                                                        │
-            "default_language": "id",                                                                                                        │
-             "languages": ["id", "en", "ru", "de", "fr"],                                                                                     │
-                   "native_language_names": true,                                                                                                   │
-                  "switcher_horizontal_position": "right",                                                                                         │
-                  "switcher_vertical_position": "bottom",                                                                                          │
-         "float_switcher_open_direction": "top",                                                                                          │
-                            "flag_style": "2d"     
-            }
-        </script>
-        <!-- <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script> -->
-        
-        <!-- Set language from localStorage -->
-        <script>
-            try {
+            // 1) Set cookies BEFORE loading the translate script
+            (function() {
+                try {
+                    var storedLang = localStorage.getItem('vins_language');
+                    if (storedLang && storedLang !== 'ID') {
+                        var langCode = storedLang.toLowerCase();
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/;';
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + window.location.hostname + ';';
+                        document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + window.location.hostname + ';';
+                    } else {
+                        // Clear any stale googtrans cookies when language is ID
+                        document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+                        document.cookie = 'googtrans=; path=/; domain=' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+                        document.cookie = 'googtrans=; path=/; domain=.' + window.location.hostname + '; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+                    }
+                } catch(e) {}
+            })();
+
+            // 2) Google Translate init callback
+            function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'id',
+                    includedLanguages: 'id,en',
+                    autoDisplay: false
+                }, 'google_translate_element');
+
+                // After init, programmatically trigger translation if needed
                 var storedLang = localStorage.getItem('vins_language');
-                if (storedLang) {
-                    var langCode = storedLang.toLowerCase();
-                    console.log('[GTranslate] Will translate to:', storedLang);
-                    
-                    // Set cookies
-                    document.cookie = 'googtrans=/auto/' + langCode + '; path=/;';
-                    document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=' + window.location.hostname + ';';
-                    document.cookie = 'googtrans=/auto/' + langCode + '; path=/; domain=.' + window.location.hostname + ';';
+                if (storedLang && storedLang === 'EN') {
+                    var attempts = 0;
+                    var triggerInterval = setInterval(function() {
+                        attempts++;
+                        var combo = document.querySelector('.goog-te-combo');
+                        if (combo) {
+                            combo.value = 'en';
+                            combo.dispatchEvent(new Event('change'));
+                            clearInterval(triggerInterval);
+                            // Hide widgets AFTER translation is triggered
+                            setTimeout(hideAllTranslateWidgets, 1000);
+                        }
+                        if (attempts > 50) clearInterval(triggerInterval); // 5s timeout
+                    }, 100);
                 } else {
-                    console.log('[GTranslate] No language stored, default ID');
+                    // No translation needed, hide widgets immediately
+                    setTimeout(hideAllTranslateWidgets, 500);
                 }
-            } catch(e) {
-                console.error('[GTranslate] Error:', e);
             }
+
+            // 3) Function to hide all Google Translate UI elements
+            function hideAllTranslateWidgets() {
+                var selectors = [
+                    'iframe.skiptranslate',
+                    'iframe.VIpgJd-ZVi9od-ORHb-OEVmcd',
+                    'iframe[id$=".container"]',
+                    'iframe.goog-te-banner-frame',
+                    'div.skiptranslate',
+                    'div[class*="VIpgJd"]',
+                    'div[class*="goog-te"]',
+                    '#goog-gt-tt',
+                    '#google_translate_element'
+                ];
+                
+                document.querySelectorAll(selectors.join(',')).forEach(function(el) {
+                    el.style.setProperty('display', 'none', 'important');
+                    el.style.setProperty('visibility', 'hidden', 'important');
+                    el.style.setProperty('height', '0', 'important');
+                    el.style.setProperty('width', '0', 'important');
+                    el.style.setProperty('position', 'absolute', 'important');
+                    el.style.setProperty('top', '-9999px', 'important');
+                });
+
+                // Reset body top (Google Translate pushes body down for its banner)
+                if (document.body) {
+                    document.body.style.setProperty('top', '0px', 'important');
+                }
+            }
+
+            // 4) MutationObserver — only to catch late-injected UI and body top changes
+            (function() {
+                var observerStarted = false;
+                
+                function startObserver() {
+                    if (observerStarted) return;
+                    observerStarted = true;
+                    
+                    var observer = new MutationObserver(function(mutations) {
+                        var needsHide = false;
+                        mutations.forEach(function(mutation) {
+                            // Check newly added nodes
+                            mutation.addedNodes.forEach(function(node) {
+                                if (node.nodeType === 1) {
+                                    var tag = node.tagName;
+                                    var cls = node.className || '';
+                                    if (tag === 'IFRAME' && (cls.indexOf('skiptranslate') !== -1 || cls.indexOf('VIpgJd') !== -1)) {
+                                        needsHide = true;
+                                    }
+                                    if (tag === 'DIV' && (cls.indexOf('skiptranslate') !== -1 || cls.indexOf('goog-te') !== -1)) {
+                                        needsHide = true;
+                                    }
+                                }
+                            });
+                            
+                            // Catch inline style changes (Google sets visibility:visible)
+                            if (mutation.type === 'attributes' && mutation.target && mutation.target.tagName === 'IFRAME') {
+                                var cls = mutation.target.className || '';
+                                if (cls.indexOf('skiptranslate') !== -1 || cls.indexOf('VIpgJd') !== -1) {
+                                    needsHide = true;
+                                }
+                            }
+                        });
+                        
+                        if (needsHide) {
+                            hideAllTranslateWidgets();
+                        }
+                        
+                        // Always ensure body top is 0
+                        if (document.body && document.body.style.top !== '0px') {
+                            document.body.style.setProperty('top', '0px', 'important');
+                        }
+                    });
+
+                    observer.observe(document.documentElement, {
+                        childList: true,
+                        subtree: true,
+                        attributes: true,
+                        attributeFilter: ['style', 'class']
+                    });
+                }
+                
+                // Delay observer start to let Google Translate finish initialization
+                setTimeout(startObserver, 3000);
+            })();
         </script>
-        <script src="https://cdn.gtranslate.net/widgets/latest/float.js" defer></script>   
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>
         @endif
     </body>
 </html>

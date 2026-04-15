@@ -36,11 +36,11 @@ const showPasswordConfirmation = ref(false);
 
 function submit() {
     if (props.isEditing && props.user) {
-        form.put(`/admin/users/${props.user.id}`, {
+        form.put(`/vbpanel/users/${props.user.id}`, {
             preserveScroll: true,
         });
     } else {
-        form.post('/admin/users', {
+        form.post('/vbpanel/users', {
             preserveScroll: true,
         });
     }
@@ -66,7 +66,7 @@ function formatDateTime(date: string) {
     <div class="flex flex-col gap-6 p-4">
         <!-- Header -->
         <div>
-            <Link href="/admin/users" class="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+            <Link href="/vbpanel/users" class="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
                 <ArrowLeft class="size-4" />
                 Kembali
             </Link>
@@ -273,7 +273,7 @@ function formatDateTime(date: string) {
                         >
                             {{ form.processing ? 'Menyimpan...' : isEditing ? 'Simpan Perubahan' : 'Tambah User' }}
                         </Button>
-                        <Link href="/admin/users" class="block">
+                        <Link href="/vbpanel/users" class="block">
                             <Button variant="outline" class="w-full" type="button">
                                 Batal
                             </Button>

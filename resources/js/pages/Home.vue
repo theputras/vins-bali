@@ -83,6 +83,11 @@ function brandLogoUrl(slug: string) {
     <section class="relative flex min-h-[90vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
         
         <!-- Image Slider Background -->
+        <!-- Static hero image -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('/images/hero-img.png')"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/70 to-transparent"></div>
+
+        <!-- Dynamic hero image carousel (commented out for now)
         <template v-if="heroImages && heroImages.length > 0">
             <div 
                 v-for="(img, idx) in heroImages" 
@@ -96,6 +101,7 @@ function brandLogoUrl(slug: string) {
         <template v-else>
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent"></div>
         </template>
+        -->
 
         <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <h1 class="animate-slide-up text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">

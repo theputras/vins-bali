@@ -18,27 +18,27 @@ import type { NavItem } from '@/types';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/admin',
+        href: '/vbpanel',
         icon: LayoutGrid,
     },
     {
         title: 'Manajemen Mobil',
-        href: '/admin/cars',
+        href: '/vbpanel/cars',
         icon: Car,
     },
     {
         title: 'Manajemen User',
-        href: '/admin/users',
+        href: '/vbpanel/users',
         icon: Users,
     },
     {
         title: 'Manajemen Layanan',
-        href: '/admin/services',
+        href: '/vbpanel/services',
         icon: Settings2,
     },
     {
         title: 'Pengaturan',
-        href: '/admin/settings',
+        href: '/vbpanel/settings',
         icon: Settings,
     },
 ];
@@ -58,7 +58,7 @@ const footerNavItems: NavItem[] = [
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton size="lg" as-child>
-                        <Link href="/admin">
+                        <Link href="/vbpanel">
                             <div class="flex items-center justify-center p-1">
                                 <img src="/images/logo.png" alt="VINS BALI" class="h-8 w-auto rounded" />
                             </div>

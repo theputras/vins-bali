@@ -97,7 +97,7 @@ class CarController extends Controller
             // Handle image uploads
             $this->handleImageUploads($car, $images);
 
-            return to_route('admin.cars.index')
+            return to_route('admin-panel.cars.index')
                 ->with('success', "Mobil \"{$car->name}\" berhasil ditambahkan.");
         });
     }
@@ -144,7 +144,7 @@ class CarController extends Controller
                 $this->handleImageUploads($car, $images);
             }
 
-            return to_route('admin.cars.index')
+            return to_route('admin-panel.cars.index')
                 ->with('success', "Mobil \"{$car->name}\" berhasil diperbarui.");
         });
     }
@@ -198,7 +198,7 @@ class CarController extends Controller
             $car->delete();
         });
 
-        return to_route('admin.cars.index')
+        return to_route('admin-panel.cars.index')
             ->with('success', "Mobil \"{$carName}\" berhasil dihapus.");
     }
 

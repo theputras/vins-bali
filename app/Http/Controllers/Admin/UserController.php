@@ -70,7 +70,7 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return to_route('admin.users.index')
+        return to_route('admin-panel.users.index')
             ->with('success', "User \"{$validated['name']}\" berhasil ditambahkan.");
     }
 
@@ -119,7 +119,7 @@ class UserController extends Controller
 
         $user->update($validated);
 
-        return to_route('admin.users.index')
+        return to_route('admin-panel.users.index')
             ->with('success', "User \"{$user->name}\" berhasil diperbarui.");
     }
 
@@ -144,7 +144,7 @@ class UserController extends Controller
         $userName = $user->name;
         $user->delete();
 
-        return to_route('admin.users.index')
+        return to_route('admin-panel.users.index')
             ->with('success', "User \"{$userName}\" berhasil dihapus.");
     }
 

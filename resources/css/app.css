@@ -108,21 +108,9 @@
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
             'Noto Color Emoji';
     }
-
-    .glass {
-        backdrop-filter: blur(12px) saturate(180%);
-        -webkit-backdrop-filter: blur(12px) saturate(180%);
-        background-color: rgba(255, 255, 255, 0.72);
-    }
-
-    .dark .glass {
-        background-color: rgba(10, 10, 10, 0.78);
-    }
-
-    .animation-delay-200 { animation-delay: 0.2s; }
-    .animation-delay-400 { animation-delay: 0.4s; }
-    .animation-delay-600 { animation-delay: 0.6s; }
 }
+
+
 
 :root {
     --background: hsl(0 0% 100%);
@@ -204,24 +192,48 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    .animation-delay-200 { animation-delay: 0.2s; }
+    .animation-delay-400 { animation-delay: 0.4s; }
+    .animation-delay-600 { animation-delay: 0.6s; }
 }
 
-/* Hide Google Translate Banner and popup completely */
+/* Hide ALL Google Translate UI elements completely */
 .goog-te-banner-frame.skiptranslate,
+.skiptranslate,
 #goog-gt-tt,
 .goog-tooltip,
 .goog-tooltip:hover,
+.goog-te-gadget,
+.goog-te-combo,
+.goog-te-balloon-frame,
+.goog-te-menu-frame,
+.goog-te-spinner-pos,
 iframe.goog-te-banner-frame,
 iframe[name="goog_te_banner_frame"],
-iframe[id^="goog"] {
+iframe[id^="goog"],
+iframe.VIpgJd-ZVi9od-ORHb-OEVmcd,
+iframe[id$=".container"],
+div.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+div.VIpgJd-ZVi9od-ORHb,
+#google_translate_element {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
 }
 .goog-text-highlight {
     background-color: transparent !important;
     box-shadow: none !important;
 }
 body {
-    top: 0px !important; 
+    top: 0px !important;
     position: static !important;
 }
 

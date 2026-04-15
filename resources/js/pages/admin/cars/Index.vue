@@ -50,7 +50,7 @@ function applyFilters() {
     if (search.value) params.search = search.value;
     if (isAvailable.value !== '') params.is_available = isAvailable.value;
 
-    router.get('/admin/cars', params, {
+    router.get('/vbpanel/cars', params, {
         preserveState: true,
         preserveScroll: true,
     });
@@ -67,13 +67,13 @@ function onSearchInput() {
 }
 
 function toggleAvailability(car: Car) {
-    router.patch(`/admin/cars/${car.id}/toggle-availability`, {}, {
+    router.patch(`/vbpanel/cars/${car.id}/toggle-availability`, {}, {
         preserveScroll: true,
     });
 }
 
 function deleteCar(car: Car) {
-    router.delete(`/admin/cars/${car.id}`, {
+    router.delete(`/vbpanel/cars/${car.id}`, {
         preserveScroll: true,
     });
 }
@@ -117,13 +117,13 @@ function openEditCategory(category: { id: number; name: string }) {
 
 function submitCategory() {
     if (editingCategory.value) {
-        categoryForm.put(`/admin/car-categories/${editingCategory.value.id}`, {
+        categoryForm.put(`/vbpanel/car-categories/${editingCategory.value.id}`, {
             onSuccess: () => {
                 showCategoryDialog.value = false;
             },
         });
     } else {
-        categoryForm.post('/admin/car-categories', {
+        categoryForm.post('/vbpanel/car-categories', {
             onSuccess: () => {
                 showCategoryDialog.value = false;
             },
@@ -132,7 +132,7 @@ function submitCategory() {
 }
 
 function deleteCategory(category: { id: number }) {
-    router.delete(`/admin/car-categories/${category.id}`, {
+    router.delete(`/vbpanel/car-categories/${category.id}`, {
         preserveScroll: true,
     });
 }
@@ -149,7 +149,7 @@ function deleteCategory(category: { id: number }) {
                 <h1 class="text-2xl font-bold tracking-tight text-foreground">Manajemen Mobil</h1>
                 <p class="text-sm text-muted-foreground">{{ cars.total }} unit total</p>
             </div>
-            <Link href="/admin/cars/create">
+            <Link href="/vbpanel/cars/create">
                 <Button class="gap-2">
                     <Plus class="size-4" />
                     Tambah Mobil
@@ -269,7 +269,7 @@ function deleteCategory(category: { id: number }) {
                                 <!-- Actions -->
                                 <td class="px-4 py-3">
                                     <div class="flex items-center justify-end gap-1">
-                                        <Link :href="`/admin/cars/${car.id}/edit`">
+                                        <Link :href="`/vbpanel/cars/${car.id}/edit`">
                                             <Button variant="ghost" size="icon-sm">
                                                 <Edit class="size-4" />
                                             </Button>
@@ -320,7 +320,7 @@ function deleteCategory(category: { id: number }) {
                 <!-- Empty state -->
                 <div v-if="!cars.data.length" class="py-12 text-center">
                     <p class="text-sm text-muted-foreground">Belum ada data mobil.</p>
-                    <Link href="/admin/cars/create" class="mt-2 inline-block">
+                    <Link href="/vbpanel/cars/create" class="mt-2 inline-block">
                         <Button variant="outline" size="sm" class="gap-2">
                             <Plus class="size-4" />
                             Tambah Mobil Pertama

@@ -13,92 +13,66 @@ const { currentCurrency } = useCurrency();
 const mobileMenuOpen = ref(false);
 const scrolled = ref(false);
 const currentLang = ref('ID');
-const isChangingLang = ref(false); // Prevent multiple rapid changes
+const isChangingLang = ref(false);
 const currentYear = ref(new Date().getFullYear());
 
 function handleScroll() {
     scrolled.value = window.scrollY > 20;
 }
 
-// Detect language from cookies or localStorage
+// Detect language from localStorage or cookies
 function detectLanguage() {
     try {
-        console.log('[Lang] Detecting language...');
-        
         // Check localStorage first (most reliable)
         const storedLang = localStorage.getItem('vins_language');
         if (storedLang) {
             currentLang.value = storedLang;
-            console.log('[Lang] From localStorage:', storedLang);
             return;
         }
         
         // Fallback to cookie detection
         const cookies = document.cookie;
-        console.log('[Lang] Cookies:', cookies.substring(0, 100));
-        
         if (cookies.includes('googtrans=/auto/en') || cookies.includes('googtrans=/id/en')) {
             currentLang.value = 'EN';
-            console.log('[Lang] From cookies: EN');
-        } else if (cookies.includes('googtrans=/auto/id') || cookies.includes('googtrans=/id/id')) {
-            currentLang.value = 'ID';
-            console.log('[Lang] From cookies: ID');
         } else {
             currentLang.value = 'ID';
-            console.log('[Lang] Using default: ID');
         }
-    } catch (error) {
-        console.error('[Lang] Error detecting:', error);
+    } catch {
         currentLang.value = 'ID';
     }
 }
 
 function changeLanguage() {
-    if (isChangingLang.value) {
-        console.log('[Lang] Change already in progress, skipping...');
-        return;
-    }
-    
-    console.log('[Lang] changeLanguage called, currentLang:', currentLang.value);
+    if (isChangingLang.value) return;
     isChangingLang.value = true;
     
     try {
-        // Determine target language (opposite of current)
         const targetLang = currentLang.value === 'ID' ? 'EN' : 'ID';
         const targetLangLower = targetLang.toLowerCase();
-        console.log('[Lang] Target language:', targetLang);
 
         // Store in localStorage
         localStorage.setItem('vins_language', targetLang);
-        console.log('[Lang] Stored in localStorage:', targetLang);
         
-        // Set GTranslate cookies with proper format
+        // Set Google Translate cookies
         const cookieValue = `/auto/${targetLangLower}`;
         const domain = window.location.hostname;
         const expires = 'expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
         
-        // Set cookies with different scopes and long expiry
         document.cookie = `googtrans=${cookieValue}; path=/; ${expires}; SameSite=Lax`;
         document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
         document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
         
-        console.log('[Lang] Cookie value set to:', cookieValue);
-        console.log('[Lang] Current cookies:', document.cookie.substring(0, 150));
-        console.log('[Lang] Reloading in 500ms...');
-        
-        // Small delay to ensure cookies are saved
+        // Small delay to ensure cookies are saved before reload
         setTimeout(() => {
             window.location.reload();
-        }, 500);
-    } catch (error) {
-        console.error('[Lang] Error:', error);
+        }, 300);
+    } catch {
         isChangingLang.value = false;
         window.location.reload();
     }
 }
 
 onMounted(() => {
-    console.log('GuestLayout mounted');
     window.addEventListener('scroll', handleScroll);
     handleScroll();
     detectLanguage();
@@ -123,9 +97,14 @@ const navLinks = [
             class="fixed top-0 right-0 left-0 z-50 transition-all duration-300"
             :class="[
                 scrolled
-                    ? 'glass border-b border-border/50 shadow-sm'
+                    ? 'border-b border-border/50 shadow-sm'
                     : 'bg-transparent',
             ]"
+            :style="scrolled ? {
+                backdropFilter: 'blur(12px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                backgroundColor: 'rgba(10, 10, 10, 0.78)',
+            } : {}"
         >
             <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
                 <!-- Logo -->
@@ -135,18 +114,6 @@ const navLinks = [
 
                 <!-- Desktop Nav -->
                 <nav class="hidden items-center gap-1 md:flex">
-                    <Link
-                        v-for="link in navLinks"
-                        :key="link.name"
-                        :href="link.href"
-                        class="rounded-md px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    >
-                        {{ link.name }}
-                    </Link>
-                </nav>
-
-                <!-- Desktop Actions -->
-                <div class="hidden items-center gap-3 md:flex">
                     <!-- Currency Dropdown -->
                     <select
                         v-model="currentCurrency"
@@ -165,7 +132,16 @@ const navLinks = [
                         <option value="ID">ID</option>
                         <option value="EN">EN</option>
                     </select>
-                </div>
+
+                    <Link
+                        v-for="link in navLinks"
+                        :key="link.name"
+                        :href="link.href"
+                        class="rounded-md px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                        {{ link.name }}
+                    </Link>
+                </nav>
 
                 <!-- Mobile Menu Button -->
                 <div class="flex items-center gap-2 md:hidden">
@@ -203,7 +179,7 @@ const navLinks = [
                 leave-from-class="opacity-100 translate-y-0"
                 leave-to-class="opacity-0 -translate-y-2"
             >
-                <div v-if="mobileMenuOpen" class="glass border-b border-border/50 md:hidden">
+                <div v-if="mobileMenuOpen" class="border-b border-border/50 md:hidden" style="backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); background-color: rgba(10, 10, 10, 0.78);">
                     <div class="space-y-1 px-4 py-3">
                         <Link
                             v-for="link in navLinks"

@@ -76,7 +76,7 @@ function submit() {
             ...data,
             whatsapp_number: wa,
         };
-    }).post('/admin/settings', {
+    }).post('/vbpanel/settings', {
         preserveScroll: true,
     });
 }

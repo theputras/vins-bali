@@ -53,13 +53,13 @@ function openEdit(service: { id: number; name: string; duration_days: number; is
 
 function submit() {
     if (editingService.value) {
-        form.put(`/admin/services/${editingService.value.id}`, {
+        form.put(`/vbpanel/services/${editingService.value.id}`, {
             onSuccess: () => {
                 showDialog.value = false;
             },
         });
     } else {
-        form.post('/admin/services', {
+        form.post('/vbpanel/services', {
             onSuccess: () => {
                 showDialog.value = false;
             },
@@ -68,7 +68,7 @@ function submit() {
 }
 
 function destroy(service: { id: number }) {
-    router.delete(`/admin/services/${service.id}`, {
+    router.delete(`/vbpanel/services/${service.id}`, {
         preserveScroll: true,
     });
 }
