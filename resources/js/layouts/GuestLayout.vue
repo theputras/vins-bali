@@ -54,19 +54,28 @@ function changeLanguage(event: Event) {
         localStorage.setItem('vins_language', targetLang);
         
         const domain = window.location.hostname;
-        const expires = 'expires=' + new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        // Get root domain (e.g. "kootaproduction.com" from "vins-bali.kootaproduction.com")
+        const parts = domain.split('.');
+        const rootDomain = parts.length > 2 ? parts.slice(-2).join('.') : domain;
 
         if (targetLang === 'EN') {
             // Translate to English
             const cookieValue = '/auto/en';
-            document.cookie = `googtrans=${cookieValue}; path=/; ${expires}; SameSite=Lax`;
-            document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain}; ${expires}; SameSite=Lax`;
-            document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain}; ${expires}; SameSite=Lax`;
+            document.cookie = `googtrans=${cookieValue}; path=/;`;
+            document.cookie = `googtrans=${cookieValue}; path=/; domain=${domain};`;
+            document.cookie = `googtrans=${cookieValue}; path=/; domain=.${domain};`;
+            document.cookie = `googtrans=${cookieValue}; path=/; domain=.${rootDomain};`;
         } else {
-            // Back to original (Indonesian) — clear googtrans cookie
-            document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
-            document.cookie = `googtrans=; path=/; domain=${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
-            document.cookie = `googtrans=; path=/; domain=.${domain}; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
+            // Back to original (Indonesian) — nuke ALL googtrans cookies
+            const expiry = 'expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            // Delete on every possible domain variation
+            document.cookie = `googtrans=; path=/; ${expiry}`;
+            document.cookie = `googtrans=; path=/; domain=${domain}; ${expiry}`;
+            document.cookie = `googtrans=; path=/; domain=.${domain}; ${expiry}`;
+            document.cookie = `googtrans=; path=/; domain=.${rootDomain}; ${expiry}`;
+            // Also set to "no translation" as fallback
+            document.cookie = `googtrans=/id/id; path=/;`;
+            document.cookie = `googtrans=/id/id; path=/; domain=.${rootDomain};`;
         }
         
         setTimeout(() => {
