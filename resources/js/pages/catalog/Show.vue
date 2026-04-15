@@ -127,14 +127,55 @@ function openTermsModal() {
                 Kembali ke Katalog
             </Link>
 
-            <div class="flex flex-col gap-8 lg:grid lg:grid-cols-5 pb-24 lg:pb-0">
+            <div class="grid gap-8 lg:grid-cols-5 pb-24 lg:pb-0">
                 <!-- Left Column (Gallery + Tabs) -->
-                <div class="order-2 lg:order-1 lg:col-span-3 space-y-8">
-                    <!-- Gallery -->
+                <div class="lg:col-span-3 space-y-8">
+                    <!-- Mobile Title (Visible only on mobile) -->
+                    <div class="lg:hidden">
+                        <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
+                            {{ car.brand }}
+                        </span>
+                        <h1 class="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                            {{ car.name }}
+                        </h1>
+                    </div>
+
+                    <!-- Gallery -->2
                     <CarGallery
                         :images="car.images ?? []"
                         :car-name="car.name"
                     />
+
+                    <!-- Mobile Info Section (Price & USP, visible only on mobile) -->
+                    <div class="space-y-6 lg:hidden">
+                        <!-- Price Tiers -->
+                        <div class="space-y-3">
+                            <div
+                                v-for="pkg in pricePackages"
+                                :key="pkg.label"
+                                class="flex items-center justify-between rounded-lg border border-border bg-muted/10 p-3.5 transition-colors hover:bg-muted/30"
+                            >
+                                <div>
+                                    <p class="text-sm font-semibold text-foreground">{{ pkg.label }}</p>
+                                    <p v-if="pkg.highlight" class="text-xs text-amber-500 font-medium mt-0.5">{{ pkg.highlight }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-bold text-foreground">{{ pkg.amount }}</span>
+                                    <span class="text-xs text-muted-foreground ml-1">{{ pkg.period }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- USP Card -->
+                        <div class="rounded-xl border border-[#9f0306]/30 bg-card p-5">
+                            <ul class="space-y-4">
+                                <li v-for="(usp, index) in usps" :key="index" class="flex items-center gap-3">
+                                    <CheckCircle class="size-5 shrink-0 text-[#9f0306]" />
+                                    <span class="text-sm font-medium text-foreground">{{ usp }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
                     <!-- Tab Navigation -->
                     <div class="flex items-center overflow-x-auto rounded border border-border bg-card text-center hide-scrollbar">
@@ -205,8 +246,8 @@ function openTermsModal() {
                     </div>
                 </div>
 
-                <!-- Right Column (Info & Booking) — entire panel sticky on desktop like Trinity -->
-                <div class="order-1 lg:order-2 lg:col-span-2">
+                <!-- Right Column (Info & Booking) — strictly for desktop -->
+                <div class="hidden lg:col-span-2 lg:block">
                     <div class="lg:sticky lg:top-24 space-y-6">
                         <div>
                             <!-- Brand badge -->
