@@ -36,6 +36,35 @@ function next() {
 
 // Lightbox
 const lightboxOpen = ref(false);
+
+// Drag to scroll for thumbnails
+const thumbnailsContainer = ref<HTMLElement | null>(null);
+let isDown = false;
+let startX = 0;
+let scrollLeft = 0;
+
+function onMouseDown(e: MouseEvent) {
+    isDown = true;
+    if (!thumbnailsContainer.value) return;
+    startX = e.pageX - thumbnailsContainer.value.offsetLeft;
+    scrollLeft = thumbnailsContainer.value.scrollLeft;
+}
+
+function onMouseLeave() {
+    isDown = false;
+}
+
+function onMouseUp() {
+    isDown = false;
+}
+
+function onMouseMove(e: MouseEvent) {
+    if (!isDown || !thumbnailsContainer.value) return;
+    e.preventDefault(); // Prevent text selection/dragging
+    const x = e.pageX - thumbnailsContainer.value.offsetLeft;
+    const walk = (x - startX) * 2;
+    thumbnailsContainer.value.scrollLeft = scrollLeft - walk;
+}
 </script>
 
 <template>
@@ -87,7 +116,15 @@ const lightboxOpen = ref(false);
         </div>
 
         <!-- Thumbnails -->
-        <div v-if="sortedImages.length > 1" class="flex gap-2 overflow-x-auto pb-1">
+        <div 
+            v-if="sortedImages.length > 1" 
+            ref="thumbnailsContainer"
+            class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar touch-pan-x cursor-grab active:cursor-grabbing"
+            @mousedown="onMouseDown"
+            @mouseleave="onMouseLeave"
+            @mouseup="onMouseUp"
+            @mousemove="onMouseMove"
+        >
             <button
                 v-for="(img, index) in sortedImages"
                 :key="img.id"
