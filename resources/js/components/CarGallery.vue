@@ -37,7 +37,7 @@ function next() {
 // Lightbox
 const lightboxOpen = ref(false);
 
-// Drag to scroll for thumbnails
+// Drag to scroll for thumbnails (mouse)
 const thumbnailsContainer = ref<HTMLElement | null>(null);
 let isDown = false;
 let startX = 0;
@@ -60,22 +60,64 @@ function onMouseUp() {
 
 function onMouseMove(e: MouseEvent) {
     if (!isDown || !thumbnailsContainer.value) return;
-    e.preventDefault(); // Prevent text selection/dragging
+    e.preventDefault();
     const x = e.pageX - thumbnailsContainer.value.offsetLeft;
     const walk = (x - startX) * 2;
     thumbnailsContainer.value.scrollLeft = scrollLeft - walk;
+}
+
+// Touch drag-to-scroll for thumbnails (mobile)
+let touchStartX = 0;
+let touchScrollLeft = 0;
+
+function onTouchStart(e: TouchEvent) {
+    if (!thumbnailsContainer.value) return;
+    touchStartX = e.touches[0].pageX - thumbnailsContainer.value.offsetLeft;
+    touchScrollLeft = thumbnailsContainer.value.scrollLeft;
+}
+
+function onTouchMove(e: TouchEvent) {
+    if (!thumbnailsContainer.value) return;
+    const x = e.touches[0].pageX - thumbnailsContainer.value.offsetLeft;
+    const walk = (x - touchStartX) * 1.5;
+    thumbnailsContainer.value.scrollLeft = touchScrollLeft - walk;
+}
+
+// Touch swipe on main image for prev/next (mobile)
+let swipeStartX = 0;
+let swipeStartY = 0;
+const SWIPE_THRESHOLD = 40;
+
+function onImageTouchStart(e: TouchEvent) {
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+}
+
+function onImageTouchEnd(e: TouchEvent) {
+    const dx = e.changedTouches[0].clientX - swipeStartX;
+    const dy = e.changedTouches[0].clientY - swipeStartY;
+    // Only trigger if horizontal swipe dominates
+    if (Math.abs(dx) > SWIPE_THRESHOLD && Math.abs(dx) > Math.abs(dy)) {
+        if (dx < 0) next();
+        else prev();
+    }
 }
 </script>
 
 <template>
     <div class="space-y-3">
         <!-- Main Image -->
-        <div class="group relative aspect-[16/10] overflow-hidden rounded-xl border border-border bg-muted">
+        <div
+            class="group relative aspect-[16/10] overflow-hidden rounded-xl border border-border bg-muted"
+            @touchstart.passive="onImageTouchStart"
+            @touchend.passive="onImageTouchEnd"
+        >
             <img
                 v-if="imageUrl"
                 :src="imageUrl"
                 :alt="`${carName} - Image ${selectedIndex + 1}`"
-                class="h-full w-full object-cover transition-transform duration-500"
+                class="h-full w-full object-cover transition-transform duration-500 select-none"
+                draggable="false"
             />
             <div
                 v-else
@@ -84,26 +126,26 @@ function onMouseMove(e: MouseEvent) {
                 <span class="text-muted-foreground/40 text-sm">No image available</span>
             </div>
 
-            <!-- Nav Arrows -->
+            <!-- Nav Arrows: always visible on mobile, hover-only on desktop -->
             <template v-if="sortedImages.length > 1">
                 <button
-                    class="absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/70 group-hover:opacity-100"
+                    class="absolute top-1/2 left-3 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/70 sm:opacity-0 sm:group-hover:opacity-100"
                     @click="prev"
                 >
                     <ChevronLeft class="size-5" />
                 </button>
                 <button
-                    class="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/70 group-hover:opacity-100"
+                    class="absolute top-1/2 right-3 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/70 sm:opacity-0 sm:group-hover:opacity-100"
                     @click="next"
                 >
                     <ChevronRight class="size-5" />
                 </button>
             </template>
 
-            <!-- Expand -->
+            <!-- Expand: always visible on mobile, hover-only on desktop -->
             <button
                 v-if="imageUrl"
-                class="absolute right-3 bottom-3 rounded-full bg-black/50 p-2 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/70 group-hover:opacity-100"
+                class="absolute right-3 bottom-3 rounded-full bg-black/50 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/70 sm:opacity-0 sm:group-hover:opacity-100"
                 @click="lightboxOpen = true"
             >
                 <Expand class="size-4" />
@@ -124,6 +166,8 @@ function onMouseMove(e: MouseEvent) {
             @mouseleave="onMouseLeave"
             @mouseup="onMouseUp"
             @mousemove="onMouseMove"
+            @touchstart.passive="onTouchStart"
+            @touchmove.passive="onTouchMove"
         >
             <button
                 v-for="(img, index) in sortedImages"
