@@ -9,6 +9,7 @@ const props = defineProps<{
 }>();
 
 const selectedIndex = ref(0);
+const slideDirection = ref<'left' | 'right'>('left');
 
 const sortedImages = computed(() =>
     [...props.images].sort((a, b) => {
@@ -27,10 +28,12 @@ const imageUrl = computed(() => {
 });
 
 function prev() {
+    slideDirection.value = 'right';
     selectedIndex.value = selectedIndex.value > 0 ? selectedIndex.value - 1 : sortedImages.value.length - 1;
 }
 
 function next() {
+    slideDirection.value = 'left';
     selectedIndex.value = selectedIndex.value < sortedImages.value.length - 1 ? selectedIndex.value + 1 : 0;
 }
 
@@ -112,19 +115,22 @@ function onImageTouchEnd(e: TouchEvent) {
             @touchstart.passive="onImageTouchStart"
             @touchend.passive="onImageTouchEnd"
         >
-            <img
-                v-if="imageUrl"
-                :src="imageUrl"
-                :alt="`${carName} - Image ${selectedIndex + 1}`"
-                class="h-full w-full object-cover transition-transform duration-500 select-none"
-                draggable="false"
-            />
-            <div
-                v-else
-                class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/10"
-            >
-                <span class="text-muted-foreground/40 text-sm">No image available</span>
-            </div>
+            <Transition :name="`gallery-slide-${slideDirection}`" mode="out-in">
+                <img
+                    v-if="imageUrl"
+                    :key="selectedIndex"
+                    :src="imageUrl"
+                    :alt="`${carName} - Image ${selectedIndex + 1}`"
+                    class="h-full w-full object-cover select-none"
+                    draggable="false"
+                />
+                <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/10"
+                >
+                    <span class="text-muted-foreground/40 text-sm">No image available</span>
+                </div>
+            </Transition>
 
             <!-- Nav Arrows: always visible on mobile, hover-only on desktop -->
             <template v-if="sortedImages.length > 1">
@@ -236,3 +242,33 @@ function onImageTouchEnd(e: TouchEvent) {
         </Transition>
     </Teleport>
 </template>
+
+<style scoped>
+/* Slide Left (next image) */
+.gallery-slide-left-enter-active,
+.gallery-slide-left-leave-active {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gallery-slide-left-enter-from {
+    opacity: 0;
+    transform: translateX(60px);
+}
+.gallery-slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(-60px);
+}
+
+/* Slide Right (prev image) */
+.gallery-slide-right-enter-active,
+.gallery-slide-right-leave-active {
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gallery-slide-right-enter-from {
+    opacity: 0;
+    transform: translateX(-60px);
+}
+.gallery-slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(60px);
+}
+</style>
