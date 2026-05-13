@@ -161,7 +161,7 @@ function onImageTouchEnd(e: TouchEvent) {
         <div 
             v-if="sortedImages.length > 1" 
             ref="thumbnailsContainer"
-            class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar touch-pan-x cursor-grab active:cursor-grabbing min-w-0"
+            class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar touch-pan-x cursor-grab active:cursor-grabbing w-full min-w-0"
             @mousedown="onMouseDown"
             @mouseleave="onMouseLeave"
             @mouseup="onMouseUp"
@@ -172,7 +172,7 @@ function onImageTouchEnd(e: TouchEvent) {
             <button
                 v-for="(img, index) in sortedImages"
                 :key="img.id"
-                class="h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all"
+                class="h-14 w-16 sm:h-16 sm:w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all"
                 :class="[
                     index === selectedIndex
                         ? 'border-primary ring-2 ring-primary/20'

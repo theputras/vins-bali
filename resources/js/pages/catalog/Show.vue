@@ -129,7 +129,7 @@ function openTermsModal() {
 
             <div class="grid gap-8 lg:grid-cols-5 pb-24 lg:pb-0">
                 <!-- Left Column (Gallery + Tabs) -->
-                <div class="lg:col-span-3 space-y-8">
+                <div class="lg:col-span-3 space-y-8 min-w-0">
                     <!-- Mobile Title (Visible only on mobile) -->
                     <div class="lg:hidden">
                         <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
@@ -247,7 +247,7 @@ function openTermsModal() {
                 </div>
 
                 <!-- Right Column (Info & Booking) — strictly for desktop -->
-                <div class="hidden lg:col-span-2 lg:block">
+                <div class="hidden lg:col-span-2 lg:block min-w-0">
                     <div class="lg:sticky lg:top-24 space-y-6">
                         <div>
                             <!-- Brand badge -->
