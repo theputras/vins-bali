@@ -105,7 +105,7 @@ function onImageTouchEnd(e: TouchEvent) {
 </script>
 
 <template>
-    <div class="space-y-3">
+    <div class="space-y-3 min-w-0">
         <!-- Main Image -->
         <div
             class="group relative aspect-[16/10] overflow-hidden rounded-xl border border-border bg-muted"
@@ -161,7 +161,7 @@ function onImageTouchEnd(e: TouchEvent) {
         <div 
             v-if="sortedImages.length > 1" 
             ref="thumbnailsContainer"
-            class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar touch-pan-x cursor-grab active:cursor-grabbing"
+            class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar touch-pan-x cursor-grab active:cursor-grabbing min-w-0"
             @mousedown="onMouseDown"
             @mouseleave="onMouseLeave"
             @mouseup="onMouseUp"
