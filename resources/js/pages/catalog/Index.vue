@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
-import { Search, SlidersHorizontal, X } from 'lucide-vue-next';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import CarCard from '@/components/CarCard.vue';
 import FlashMessage from '@/components/FlashMessage.vue';
@@ -79,16 +79,30 @@ watch([brand, transmission, seats, sort], () => {
     <Head title="Katalog Mobil" />
     <FlashMessage />
 
-    <div class="pt-24 pb-16">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <section class="relative flex min-h-[90vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
+        <!-- Background Image -->
+        <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('/images/hero-img.png')"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/70 to-transparent"></div>
 
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold tracking-tight text-foreground">Katalog Mobil</h1>
-                <p class="mt-2 text-muted-foreground">
-                    Temukan mobil impian Anda dari koleksi premium kami. {{ cars.total }} unit tersedia.
-                </p>
-            </div>
+        <div class="relative z-10 flex flex-1 flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <h1 class="animate-slide-up text-5xl font-bold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+                Katalog
+                <span class="bg-gradient-to-r from-red-400 to-amber-400 bg-clip-text text-transparent">Mobil</span>
+            </h1>
+
+            <p class="mx-auto mt-6 max-w-2xl animate-slide-up text-lg leading-relaxed text-gray-300 animation-delay-200">
+                Temukan mobil impian Anda dari koleksi premium kami. {{ cars.total }} unit tersedia.
+            </p>
+
+          
+        </div>
+
+        <div class="absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
+    </section>
+
+    <div id="catalog-content" class="pb-16 pt-12">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
             <!-- Search & Filters -->
             <div class="mb-8 space-y-4">

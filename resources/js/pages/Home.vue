@@ -94,8 +94,16 @@ function brandLogoUrl(slug: string) {
     <section class="relative flex min-h-[90vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
         
         <!-- Image Slider Background -->
-        <!-- Static hero image -->
-        <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('/images/hero-img.png')"></div>
+        <!-- Background Video -->
+        <video
+            class="absolute inset-0 h-full w-full object-cover object-center opacity-40"
+            src="/hero-vids.mp4"
+            autoplay
+            loop
+            muted
+            playsinline
+            preload="auto"
+        ></video>
         <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/70 to-transparent"></div>
 
         <!-- Dynamic hero image carousel (commented out for now)
