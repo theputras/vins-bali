@@ -104,7 +104,7 @@ watch([brand, transmission, seats, sort], () => {
         <div class="absolute right-0 bottom-0 left-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
     </section>
 
-    <div id="catalog-content" class="pb-16 pt-20">
+    <div id="catalog-content" class="pb-16 pt-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
             <!-- Search & Filters -->
