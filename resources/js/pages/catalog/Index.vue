@@ -5,7 +5,10 @@ import { computed, ref, watch } from 'vue';
 import CarCard from '@/components/CarCard.vue';
 import FlashMessage from '@/components/FlashMessage.vue';
 import { Button } from '@/components/ui/button';
+import { useScrollReveal } from '@/composables/useScrollReveal';
 import type { Car } from '@/types';
+
+useScrollReveal();
 
 interface PaginatedCars {
     data: Car[];
@@ -80,7 +83,7 @@ watch([brand, transmission, seats, sort], () => {
     <FlashMessage />
 
     <!-- Hero Section -->
-    <section class="relative flex min-h-[90vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
+    <section class="relative flex min-h-[100vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
         <!-- Background Image -->
         <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('/images/hero-img.png')"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/70 to-transparent"></div>
@@ -105,7 +108,7 @@ watch([brand, transmission, seats, sort], () => {
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
             <!-- Search & Filters -->
-            <div class="mb-8 space-y-4">
+            <div class="mb-8 space-y-4" data-reveal>
                 <!-- Search bar -->
                 <div class="flex gap-3">
                     <div class="relative flex-1">
@@ -218,7 +221,7 @@ watch([brand, transmission, seats, sort], () => {
             </div>
 
             <!-- Car Grid -->
-            <div v-if="cars.data.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div v-if="cars.data.length" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-reveal data-reveal-delay="200">
                 <CarCard v-for="car in cars.data" :key="car.id" :car="car" />
             </div>
 

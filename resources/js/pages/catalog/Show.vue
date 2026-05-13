@@ -15,7 +15,10 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { useScrollReveal } from '@/composables/useScrollReveal';
 import type { Car } from '@/types';
+
+useScrollReveal();
 
 const props = defineProps<{
     car: Car;
@@ -129,7 +132,7 @@ function openTermsModal() {
 
             <div class="grid gap-8 lg:grid-cols-5 pb-24 lg:pb-0">
                 <!-- Left Column (Gallery + Tabs) -->
-                <div class="lg:col-span-3 space-y-8 min-w-0">
+                <div class="lg:col-span-3 space-y-8 min-w-0" data-reveal>
                     <!-- Mobile Title (Visible only on mobile) -->
                     <div class="lg:hidden">
                         <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
@@ -178,7 +181,7 @@ function openTermsModal() {
                     </div>
 
                     <!-- Tab Navigation -->
-                    <div class="flex items-center overflow-x-auto rounded border border-border bg-card text-center hide-scrollbar">
+                    <div class="flex items-center overflow-x-auto rounded border border-border bg-card text-center hide-scrollbar" data-reveal>
                         <button 
                             @click="activeTab = 'specifications'"
                             class="flex-1 whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors uppercase tracking-wider"
@@ -196,7 +199,7 @@ function openTermsModal() {
                     </div>
 
                     <!-- Tab Content -->
-                    <div class="rounded-xl border border-border bg-card p-6 sm:p-8 min-h-[300px]">
+                    <div class="rounded-xl border border-border bg-card p-6 sm:p-8 min-h-[300px]" data-reveal data-reveal-delay="200">
                         <!-- Specifications Tab -->
                         <div v-show="activeTab === 'specifications'" class="animate-fade-in">
                             <h3 class="mb-6 text-xl font-bold tracking-tight text-foreground">Spesifikasi Kendaraan</h3>
@@ -240,14 +243,14 @@ function openTermsModal() {
                     </div>
                     
                     <!-- Description Moved Below Tab Content -->
-                    <div v-if="car.description" class="rounded-xl border border-border bg-card p-6 sm:p-8">
+                    <div v-if="car.description" class="rounded-xl border border-border bg-card p-6 sm:p-8" data-reveal>
                         <h3 class="mb-4 text-xl font-bold tracking-tight text-foreground">Unit Overview</h3>
                         <p class="text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap">{{ car.description }}</p>
                     </div>
                 </div>
 
                 <!-- Right Column (Info & Booking) — strictly for desktop -->
-                <div class="hidden lg:col-span-2 lg:block min-w-0">
+                <div class="hidden lg:col-span-2 lg:block min-w-0" data-reveal="right" data-reveal-delay="200">
                     <div class="lg:sticky lg:top-24 space-y-6">
                         <div>
                             <!-- Brand badge -->
@@ -319,7 +322,7 @@ function openTermsModal() {
             </div>
 
             <!-- Related Cars -->
-            <div v-if="relatedCars.length" class="mt-16">
+            <div v-if="relatedCars.length" class="mt-16" data-reveal>
                 <h2 class="text-xl font-bold tracking-tight text-foreground">Mobil Lainnya</h2>
                 <p class="mt-1 text-sm text-muted-foreground">Mungkin Anda juga tertarik dengan pilihan ini.</p>
 

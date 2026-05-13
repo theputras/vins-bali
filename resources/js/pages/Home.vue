@@ -5,7 +5,10 @@ import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, shallowRef
 import CarCard from '@/components/CarCard.vue';
 import FlashMessage from '@/components/FlashMessage.vue';
 import { Button } from '@/components/ui/button';
+import { useScrollReveal } from '@/composables/useScrollReveal';
 import type { Car } from '@/types';
+
+useScrollReveal();
 
 const props = defineProps<{
     featuredCars: Car[];
@@ -91,7 +94,7 @@ function brandLogoUrl(slug: string) {
     <FlashMessage />
 
     <!-- STAGE 1: Hero Section & USPs -->
-    <section class="relative flex min-h-[90vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
+    <section class="relative flex min-h-[100vh] flex-col overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 pt-24">
         
         <!-- Image Slider Background -->
         <!-- Background Video -->
@@ -154,7 +157,7 @@ function brandLogoUrl(slug: string) {
     </section>
 
     <!-- Brand Logos Marquee Strip -->
-    <section v-if="brandLogos.length" class="border-y border-border/30 bg-muted/10 py-10 overflow-hidden">
+    <section v-if="brandLogos.length" class="border-y border-border/30 bg-muted/10 py-10 overflow-hidden" data-reveal="fade">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-6 text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Trusted Car Brands We Partner With</p>
         </div>
@@ -180,7 +183,7 @@ function brandLogoUrl(slug: string) {
     <!-- STAGE 2: Search & Vehicle Exploration -->
     <section id="fleet" class="py-20 bg-background">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center sm:text-left">
+            <div class="text-center sm:text-left" data-reveal>
                 <h2 class="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                     Temukan Mobil Ideal Anda
                 </h2>
@@ -190,7 +193,7 @@ function brandLogoUrl(slug: string) {
             </div>
 
             <!-- Categories Filter -->
-            <div class="mt-8 flex flex-wrap gap-2 justify-center sm:justify-start">
+            <div class="mt-8 flex flex-wrap gap-2 justify-center sm:justify-start" data-reveal data-reveal-delay="200">
                 <button
                     v-for="cat in popularCategories"
                     :key="cat"
@@ -203,7 +206,7 @@ function brandLogoUrl(slug: string) {
             </div>
 
             <!-- Featured Cars Grid -->
-            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-reveal data-reveal-delay="300">
                 <CarCard
                     v-for="car in filteredCars"
                     :key="car.id"
@@ -229,12 +232,12 @@ function brandLogoUrl(slug: string) {
     <!-- STAGE 3: Specific Services & Purpose -->
     <section class="border-t border-border/50 bg-muted/20 py-24">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
+            <div class="text-center" data-reveal>
                 <h2 class="text-3xl font-bold tracking-tight text-foreground">Layanan Premium Eksklusif</h2>
                 <p class="mx-auto mt-4 max-w-2xl text-muted-foreground">Lebih dari sekadar sewa mobil harian, kami menyediakan solusi mobilitas untuk setiap kebutuhan VIP Anda.</p>
             </div>
 
-            <div class="mt-16 grid gap-8 md:grid-cols-3">
+            <div class="mt-16 grid gap-8 md:grid-cols-3" data-reveal data-reveal-delay="200">
                 <div v-for="service in homeServices" :key="service.title" class="rounded-2xl border border-border bg-card p-8 shadow-sm transition hover:shadow-md">
                     <div class="inline-flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                         <component :is="getIconComponent(service.icon)" class="size-6" />
@@ -250,7 +253,7 @@ function brandLogoUrl(slug: string) {
 
     <!-- STAGE 4: FAQ & Fast Rules -->
     <section class="py-24 bg-background">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center border p-12 rounded-3xl border-border bg-card shadow-sm">
+        <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center border p-12 rounded-3xl border-border bg-card shadow-sm" data-reveal>
             <h2 class="text-3xl font-bold tracking-tight text-foreground">Kriteria Penyewaan Cepat</h2>
             <div class="mt-8 grid gap-8 sm:grid-cols-2 text-left">
                 <div>
@@ -276,7 +279,7 @@ function brandLogoUrl(slug: string) {
     <section class="py-24 bg-gradient-to-b from-background to-muted/30">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid gap-16 lg:grid-cols-2 items-center">
-                <div>
+                <div data-reveal>
                     <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">Hanya 3 Langkah Mudah</h2>
                     <div class="mt-8 space-y-6">
                         <div class="flex gap-4">
@@ -314,7 +317,7 @@ function brandLogoUrl(slug: string) {
                     </div>
                 </div>
 
-                <div class="rounded-2xl border border-border bg-card p-8 shadow-xl">
+                <div class="rounded-2xl border border-border bg-card p-8 shadow-xl" data-reveal="right" data-reveal-delay="200">
                     <h3 class="text-2xl font-bold">Kami Hubungi Anda Segera</h3>
                     <p class="mt-2 text-sm text-muted-foreground">Tinggalkan nomor Anda, manajer VIP kami akan menghubungi dalam 1 menit.</p>
                     
