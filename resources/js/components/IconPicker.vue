@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import * as LucideIcons from 'lucide-vue-next';
+import { ref, computed, watch, shallowRef } from 'vue';
+import { HelpCircle } from 'lucide-vue-next';
 import {
     Dialog,
     DialogContent,
@@ -21,14 +21,24 @@ const emit = defineEmits<{
 const isOpen = ref(false);
 const searchQuery = ref('');
 
-// Filter out non-component exports from lucide-vue-next
-const allIcons = Object.keys(LucideIcons).filter(
-    (key) => key !== 'createLucideIcon' && key !== 'default'
-);
+// Lazy-loaded icon module — only loads when picker opens
+const lucideModule = shallowRef<Record<string, any> | null>(null);
+const allIcons = ref<string[]>([]);
+
+watch(isOpen, async (open) => {
+    if (open && !lucideModule.value) {
+        const mod = await import('lucide-vue-next');
+        lucideModule.value = mod;
+        allIcons.value = Object.keys(mod).filter(
+            (key) => key !== 'createLucideIcon' && key !== 'default' && key !== 'icons'
+                && typeof mod[key] === 'object'
+        );
+    }
+});
 
 const filteredIcons = computed(() => {
-    if (!searchQuery.value) return allIcons.slice(0, 50); // limit to avoid lag
-    return allIcons
+    if (!searchQuery.value) return allIcons.value.slice(0, 50); // limit to avoid lag
+    return allIcons.value
         .filter((name) => name.toLowerCase().includes(searchQuery.value.toLowerCase()))
         .slice(0, 50);
 });
@@ -40,8 +50,10 @@ function selectIcon(name: string) {
 
 // Ensure the icon component actually exists before rendering
 function getIconComponent(name: string) {
-    // @ts-ignore
-    return LucideIcons[name] || LucideIcons['HelpCircle'];
+    if (lucideModule.value) {
+        return lucideModule.value[name] || lucideModule.value['HelpCircle'] || HelpCircle;
+    }
+    return HelpCircle;
 }
 </script>
 

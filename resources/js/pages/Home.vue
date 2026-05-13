@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ArrowRight, CheckCircle2, ChevronRight, Clock, MapPin, MessageCircle, ShieldCheck, Sparkles, Star } from 'lucide-vue-next';
+import { ArrowRight, CheckCircle2, ChevronRight, Star } from 'lucide-vue-next';
+import { computed, defineAsyncComponent, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import CarCard from '@/components/CarCard.vue';
 import FlashMessage from '@/components/FlashMessage.vue';
 import { Button } from '@/components/ui/button';
-import { type Car } from '@/types';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import type { Car } from '@/types';
 
 const props = defineProps<{
     featuredCars: Car[];
@@ -36,16 +36,26 @@ const popularCategories = computed(() => ['Semua', ...props.categories]);
 const activeCategory = ref('Semua');
 
 // Filter featured cars by active category if it's set
-// Filter featured cars by active category if it's set
 const filteredCars = computed(() => {
     if (activeCategory.value === 'Semua') return props.featuredCars;
     return props.featuredCars.filter(c => c.category?.name === activeCategory.value);
 });
 
-import * as LucideIcons from 'lucide-vue-next';
+// Dynamically resolve icon component by name — avoids barrel-importing all ~1500 icons
+const iconCache = new Map<string, ReturnType<typeof defineAsyncComponent>>();
 function getIconComponent(name: string) {
-    // @ts-ignore
-    return LucideIcons[name] || LucideIcons['Star'];
+    if (!name) return Star;
+    if (iconCache.has(name)) return iconCache.get(name)!;
+
+    const asyncIcon = defineAsyncComponent({
+        loader: () =>
+            import('lucide-vue-next').then((mod) => {
+                // @ts-ignore — dynamic lookup by icon name
+                return mod[name] || mod['Star'];
+            }),
+    });
+    iconCache.set(name, asyncIcon);
+    return asyncIcon;
 }
 
 const usps = computed(() => {
