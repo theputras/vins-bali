@@ -47,17 +47,19 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
             ],
             'global_settings' => function () {
-                $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-                $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
-                foreach ($jsonKeys as $k) {
-                    if (isset($settings[$k])) {
-                        $decoded = @json_decode($settings[$k], true);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $settings[$k] = $decoded;
+                return \Illuminate\Support\Facades\Cache::rememberForever('global_settings', function () {
+                    $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+                    $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
+                    foreach ($jsonKeys as $k) {
+                        if (isset($settings[$k])) {
+                            $decoded = @json_decode($settings[$k], true);
+                            if (json_last_error() === JSON_ERROR_NONE) {
+                                $settings[$k] = $decoded;
+                            }
                         }
                     }
-                }
-                return $settings;
+                    return $settings;
+                });
             },
             'exchange_rate' => \Illuminate\Support\Facades\Cache::remember('exchange_rate_idr_usd', 3600, function () {
                 try {

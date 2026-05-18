@@ -75,6 +75,8 @@ class SettingController extends Controller
             );
         }
 
+        \Illuminate\Support\Facades\Cache::forget('global_settings');
+
         return back()->with('success', 'Pengaturan website berhasil diperbarui.');
     }
 }

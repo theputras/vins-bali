@@ -94,8 +94,9 @@ class CarController extends Controller
                 $car->services()->sync($syncData);
             }
 
-            // Handle image uploads
             $this->handleImageUploads($car, $images);
+
+            $this->clearHomeCache();
 
             return to_route('admin-panel.cars.index')
                 ->with('success', "Mobil \"{$car->name}\" berhasil ditambahkan.");
@@ -139,10 +140,11 @@ class CarController extends Controller
             }
             $car->services()->sync($syncData);
 
-            // Handle new image uploads
             if (! empty($images)) {
                 $this->handleImageUploads($car, $images);
             }
+
+            $this->clearHomeCache();
 
             return to_route('admin-panel.cars.index')
                 ->with('success', "Mobil \"{$car->name}\" berhasil diperbarui.");
@@ -155,6 +157,8 @@ class CarController extends Controller
     public function toggleAvailability(Car $car): RedirectResponse
     {
         $car->update(['is_available' => ! $car->is_available]);
+
+        $this->clearHomeCache();
 
         $status = $car->is_available ? 'tersedia' : 'tidak tersedia';
 
@@ -178,6 +182,8 @@ class CarController extends Controller
             }
         });
 
+        $this->clearHomeCache();
+
         return back()->with('success', 'Urutan mobil berhasil diperbarui.');
     }
 
@@ -197,6 +203,8 @@ class CarController extends Controller
             // Car images will be cascade deleted via FK
             $car->delete();
         });
+
+        $this->clearHomeCache();
 
         return to_route('admin-panel.cars.index')
             ->with('success', "Mobil \"{$carName}\" berhasil dihapus.");
@@ -224,5 +232,15 @@ class CarController extends Controller
                 'sort_order' => $currentMaxOrder + $index + 1,
             ]);
         }
+    }
+
+    /**
+     * Clear home page caches to ensure fresh data.
+     */
+    private function clearHomeCache(): void
+    {
+        \Illuminate\Support\Facades\Cache::forget('home_featured_cars');
+        \Illuminate\Support\Facades\Cache::forget('home_hero_images');
+        \Illuminate\Support\Facades\Cache::forget('home_categories');
     }
 }
