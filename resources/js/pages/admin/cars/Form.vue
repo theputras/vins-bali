@@ -6,6 +6,7 @@ import FlashMessage from '@/components/FlashMessage.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Car } from '@/types';
+import { ALL_BRANDS } from '@/lib/carBrands';
 
 const props = defineProps<{
     car: (Car & { services?: any[] }) | null;
@@ -16,17 +17,14 @@ const props = defineProps<{
 
 const page = usePage();
 
-const brandOptions = computed(() => {
-    return (page.props.global_settings as any)?.home_brand_logos || [];
-});
-
 const isBrandDropdownOpen = ref(false);
 const brandSearch = ref('');
 const filteredBrands = computed(() => {
     const q = brandSearch.value.toLowerCase();
-    return brandOptions.value.filter((b: any) => 
-        b.label.toLowerCase().includes(q) || b.slug.includes(q)
-    );
+    return ALL_BRANDS.filter((b) => {
+        if (q && !b.label.toLowerCase().includes(q) && !b.slug.includes(q)) return false;
+        return true;
+    });
 });
 
 function selectBrand(brandLabel: string) {
