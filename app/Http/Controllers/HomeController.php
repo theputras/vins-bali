@@ -20,7 +20,8 @@ class HomeController extends Controller
                 ->featured()
                 ->ordered()
                 ->take(6)
-                ->get();
+                ->get()
+                ->toArray();
         });
 
         $heroImages = \Illuminate\Support\Facades\Cache::remember('home_hero_images', 86400, function () {
