@@ -17,7 +17,7 @@ class SettingController extends Controller
     public function index(): Response
     {
         $settings = Setting::pluck('value', 'key')->toArray();
-        $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos'];
+        $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
         
         foreach ($jsonKeys as $k) {
             if (isset($settings[$k])) {
@@ -59,6 +59,7 @@ class SettingController extends Controller
             'home_services' => ['nullable', 'array'],
             'rental_requirements' => ['nullable', 'array'],
             'home_brand_logos' => ['nullable', 'array'],
+            'seo_settings' => ['nullable', 'array'],
             'home_hero_title' => ['required', 'string', 'max:255'],
             'home_hero_highlight' => ['required', 'string', 'max:255'],
             'home_hero_subtitle' => ['required', 'string', 'max:1000'],

@@ -34,9 +34,25 @@ const form = useForm({
     home_hero_subtitle: props.settings.home_hero_subtitle ?? 'Pilih dari 80+ koleksi mobil premium, sports, dan eksklusif.',
     rental_requirements_footer: props.settings.rental_requirements_footer ?? 'Umur minimal 21 tahun untuk mobil standar...',
     home_brand_logos: Array.isArray(props.settings.home_brand_logos) ? props.settings.home_brand_logos : [],
+    seo_settings: props.settings.seo_settings ?? { 
+        site_name: 'VINS BALI',
+        author: 'VINS BALI',
+        robots: 'index, follow',
+        twitter_handle: '@vinsbali',
+        og_locale: 'id_ID',
+        default_title: 'VINS BALI - Premium Car Rental', 
+        default_description: 'Premium car rental service in Bali. Experience the island with luxury and style.', 
+        default_keywords: 'rental mobil bali, sewa mobil premium bali, luxury car rental bali',
+        home_title: 'Premium Car Rental in Bali', 
+        home_description: 'Pilih dari 80+ koleksi mobil premium, sports, dan eksklusif. Pengalaman berkendara VIP yang tak tertandingi di Pulau Dewata.', 
+        home_keywords: 'rental mobil mewah bali, sewa alphard bali, rental porsche bali',
+        catalog_title: 'Katalog Mobil', 
+        catalog_description: 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.',
+        catalog_keywords: 'katalog mobil bali, harga sewa mobil bali'
+    },
 });
 
-const activeTab = ref<'umum' | 'homepage'>('umum');
+const activeTab = ref<'umum' | 'homepage' | 'seo'>('umum');
 
 function addTerm() {
     form.terms_and_conditions.push('');
@@ -106,6 +122,13 @@ function submit() {
                 :class="activeTab === 'homepage' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'"
             >
                 Teks Homepage (Beranda)
+            </button>
+            <button
+                @click="activeTab = 'seo'"
+                class="px-4 py-2 text-sm font-medium transition-colors border-b-2"
+                :class="activeTab === 'seo' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted'"
+            >
+                SEO & Meta
             </button>
         </div>
 
@@ -300,7 +323,7 @@ function submit() {
                             <Star class="size-5 text-primary" />
                             Logo Brand Mobil
                         </CardTitle>
-                        <CardDescription>Pilih logo brand mobil yang akan ditampilkan sebagai marquee strip di halaman depan.</CardDescription>
+                        <CardDescription>Pilih logo brand mobil yang akan Informasi Dasar sebagai marquee strip di halaman depan.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <BrandLogoPicker v-model="form.home_brand_logos" />
@@ -456,6 +479,97 @@ function submit() {
                                 class="w-full rounded-md border border-input bg-background p-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                             ></textarea>
                             <p v-if="form.errors.rental_requirements_footer" class="mt-1 text-xs text-destructive">{{ form.errors.rental_requirements_footer }}</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div v-show="activeTab === 'seo'" class="grid gap-6">
+                <!-- Default SEO -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2 text-lg">
+                            <Star class="size-5 text-primary" />
+                            SEO Default (Global)
+                        </CardTitle>
+                        <CardDescription>Meta tags standar jika halaman tidak memiliki SEO spesifik.</CardDescription>
+                    </CardHeader>
+                    <CardContent class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">Site Name</label>
+                            <input v-model="form.seo_settings.site_name" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">Author</label>
+                            <input v-model="form.seo_settings.author" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">Robots</label>
+                            <input v-model="form.seo_settings.robots" type="text" placeholder="index, follow" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">Twitter Handle</label>
+                            <input v-model="form.seo_settings.twitter_handle" type="text" placeholder="@vinsbali" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Default Keywords</label>
+                            <input v-model="form.seo_settings.default_keywords" type="text" placeholder="keyword1, keyword2, keyword3" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Default Title (OG)</label>
+                            <input v-model="form.seo_settings.default_title" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Default Description</label>
+                            <textarea v-model="form.seo_settings.default_description" rows="2" class="w-full rounded-md border border-input bg-background p-3 text-sm outline-none transition focus:border-primary"></textarea>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Home SEO -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2 text-lg">
+                            <Star class="size-5 text-primary" />
+                            SEO Beranda (Home)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="grid gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Home Keywords</label>
+                            <input v-model="form.seo_settings.home_keywords" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Home Title</label>
+                            <input v-model="form.seo_settings.home_title" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Home Description</label>
+                            <textarea v-model="form.seo_settings.home_description" rows="2" class="w-full rounded-md border border-input bg-background p-3 text-sm outline-none transition focus:border-primary"></textarea>
+                        </div>
+                    </CardContent>
+                </Card>
+                
+                <!-- Catalog SEO -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle class="flex items-center gap-2 text-lg">
+                            <Star class="size-5 text-primary" />
+                            SEO Katalog (Index)
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="grid gap-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Catalog Keywords</label>
+                            <input v-model="form.seo_settings.catalog_keywords" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Catalog Title</label>
+                            <input v-model="form.seo_settings.catalog_title" type="text" class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary" />
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-sm font-medium">Catalog Description</label>
+                            <textarea v-model="form.seo_settings.catalog_description" rows="2" class="w-full rounded-md border border-input bg-background p-3 text-sm outline-none transition focus:border-primary"></textarea>
                         </div>
                     </CardContent>
                 </Card>

@@ -79,7 +79,18 @@ watch([brand, transmission, seats, sort], () => {
 </script>
 
 <template>
-    <Head title="Katalog Mobil" />
+    <Head>
+        <title>{{ $page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil' }}</title>
+        <meta head-key="description" name="description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
+        <meta head-key="keywords" name="keywords" :content="$page.props.global_settings?.seo_settings?.catalog_keywords || $page.props.global_settings?.seo_settings?.default_keywords || 'katalog mobil bali, harga sewa mobil bali'" />
+        
+        <meta head-key="og:title" property="og:title" :content="($page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil') + ' - VINS BALI'" />
+        <meta head-key="og:description" property="og:description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
+        <meta head-key="og:type" property="og:type" content="website" />
+
+        <meta head-key="twitter:title" name="twitter:title" :content="($page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil') + ' - VINS BALI'" />
+        <meta head-key="twitter:description" name="twitter:description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
+    </Head>
     <FlashMessage />
 
     <!-- Hero Section -->

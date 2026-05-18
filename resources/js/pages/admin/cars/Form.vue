@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, Eye, EyeOff, ImagePlus, Star, Trash2, Upload, X } from 'lucide-vue-next';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
+import { ArrowLeft, Eye, EyeOff, ImagePlus, Star, Trash2, Upload, X, ChevronDown, Search, Check } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import FlashMessage from '@/components/FlashMessage.vue';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,27 @@ const props = defineProps<{
     categories?: { id: number; name: string }[];
     services?: { id: number; name: string; duration_days: number; is_active: boolean }[];
 }>();
+
+const page = usePage();
+
+const brandOptions = computed(() => {
+    return (page.props.global_settings as any)?.home_brand_logos || [];
+});
+
+const isBrandDropdownOpen = ref(false);
+const brandSearch = ref('');
+const filteredBrands = computed(() => {
+    const q = brandSearch.value.toLowerCase();
+    return brandOptions.value.filter((b: any) => 
+        b.label.toLowerCase().includes(q) || b.slug.includes(q)
+    );
+});
+
+function selectBrand(brandLabel: string) {
+    form.brand = brandLabel;
+    isBrandDropdownOpen.value = false;
+    brandSearch.value = '';
+}
 
 const form = useForm({
     name: props.car?.name ?? '',
@@ -181,16 +202,49 @@ const pageTitle = computed(() => props.isEditing ? `Edit: ${props.car?.name}` : 
                             </div>
 
                             <!-- Brand -->
-                            <div>
+                            <div class="relative">
                                 <label class="mb-1.5 block text-sm font-medium">Merk *</label>
-                                <input
-                                    v-model="form.brand"
-                                    type="text"
-                                    placeholder="e.g. BMW"
-                                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                <div 
+                                    class="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm cursor-pointer transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20"
                                     :class="{ 'border-destructive': form.errors.brand }"
-                                />
+                                    @click="isBrandDropdownOpen = !isBrandDropdownOpen"
+                                >
+                                    <span v-if="form.brand">{{ form.brand }}</span>
+                                    <span v-else class="text-muted-foreground">Pilih Merk...</span>
+                                    <ChevronDown class="size-4 opacity-50" />
+                                </div>
                                 <p v-if="form.errors.brand" class="mt-1 text-xs text-destructive">{{ form.errors.brand }}</p>
+
+                                <!-- Dropdown Overlay -->
+                                <div v-if="isBrandDropdownOpen" class="fixed inset-0 z-40" @click="isBrandDropdownOpen = false"></div>
+                                
+                                <!-- Dropdown Content -->
+                                <div v-if="isBrandDropdownOpen" class="absolute left-0 top-[60px] z-50 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none">
+                                    <div class="flex items-center border-b px-3">
+                                        <Search class="mr-2 size-4 shrink-0 opacity-50" />
+                                        <input 
+                                            v-model="brandSearch" 
+                                            class="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground" 
+                                            placeholder="Cari merk..." 
+                                            autofocus
+                                        />
+                                    </div>
+                                    <div class="max-h-[200px] overflow-y-auto p-1">
+                                        <div 
+                                            v-for="brand in filteredBrands" 
+                                            :key="brand.slug"
+                                            class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                                            @click="selectBrand(brand.label)"
+                                        >
+                                            <img :src="`https://cdn.jsdelivr.net/gh/filippofilip95/car-logos-dataset@master/logos/optimized/${brand.slug}.png`" class="mr-2 h-4 w-auto object-contain" />
+                                            {{ brand.label }}
+                                            <Check v-if="form.brand === brand.label" class="ml-auto size-4" />
+                                        </div>
+                                        <div v-if="filteredBrands.length === 0" class="py-6 text-center text-sm text-muted-foreground">
+                                            Merk tidak ditemukan di pengaturan.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

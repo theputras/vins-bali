@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { Menu, X } from 'lucide-vue-next';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -118,6 +118,28 @@ function formatPhone(num: string) {
 </script>
 
 <template>
+    <Head>
+        <!-- Standard SEO -->
+        <meta head-key="description" name="description" :content="$page.props.global_settings?.seo_settings?.default_description || 'Premium car rental service in Bali. Experience the island with luxury and style.'" />
+        <meta head-key="keywords" name="keywords" :content="$page.props.global_settings?.seo_settings?.default_keywords || 'rental mobil bali, sewa mobil premium bali, luxury car rental bali'" />
+        <meta head-key="author" name="author" :content="$page.props.global_settings?.seo_settings?.author || 'VINS BALI'" />
+        <meta head-key="robots" name="robots" :content="$page.props.global_settings?.seo_settings?.robots || 'index, follow'" />
+
+        <!-- Open Graph / Facebook -->
+        <meta head-key="og:site_name" property="og:site_name" :content="$page.props.global_settings?.seo_settings?.site_name || 'VINS BALI'" />
+        <meta head-key="og:locale" property="og:locale" :content="$page.props.global_settings?.seo_settings?.og_locale || 'id_ID'" />
+        <meta head-key="og:title" property="og:title" :content="$page.props.global_settings?.seo_settings?.default_title || 'VINS BALI - Premium Car Rental'" />
+        <meta head-key="og:description" property="og:description" :content="$page.props.global_settings?.seo_settings?.default_description || 'Premium car rental service in Bali. Experience the island with luxury and style.'" />
+        <meta head-key="og:type" property="og:type" content="website" />
+        <meta head-key="og:image" property="og:image" content="/images/logo.png" />
+        
+        <!-- Twitter -->
+        <meta head-key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta head-key="twitter:site" name="twitter:site" :content="$page.props.global_settings?.seo_settings?.twitter_handle || ''" />
+        <meta head-key="twitter:title" name="twitter:title" :content="$page.props.global_settings?.seo_settings?.default_title || 'VINS BALI - Premium Car Rental'" />
+        <meta head-key="twitter:description" name="twitter:description" :content="$page.props.global_settings?.seo_settings?.default_description || 'Premium car rental service in Bali. Experience the island with luxury and style.'" />
+        <meta head-key="twitter:image" name="twitter:image" content="/images/logo.png" />
+    </Head>
     <div class="min-h-screen bg-background text-foreground">
         <!-- Navbar -->
         <header

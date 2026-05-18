@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'global_settings' => function () {
                 $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-                $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos'];
+                $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
                 foreach ($jsonKeys as $k) {
                     if (isset($settings[$k])) {
                         $decoded = @json_decode($settings[$k], true);

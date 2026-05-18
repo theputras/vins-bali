@@ -32,7 +32,7 @@ const mainNavItems: NavItem[] = [
         icon: Users,
     },
     {
-        title: 'Manajemen Layanan',
+        title: 'Manajemen Diskon',
         href: '/vbpanel/services',
         icon: Settings2,
     },

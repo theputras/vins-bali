@@ -8,6 +8,9 @@ use Laravel\Fortify\Features;
 // ─── Public Routes ───────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Sitemap
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+
 // Catalog
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/catalog/{slug}', [CatalogController::class, 'show'])->name('catalog.show');

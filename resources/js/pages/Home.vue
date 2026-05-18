@@ -90,7 +90,18 @@ function brandLogoUrl(slug: string) {
 </script>
 
 <template>
-    <Head title="Premium Car Rental in Bali" />
+    <Head>
+        <title>{{ $page.props.global_settings?.seo_settings?.home_title || 'Premium Car Rental in Bali' }}</title>
+        <meta head-key="description" name="description" :content="$page.props.global_settings?.seo_settings?.home_description || heroSubtitle" />
+        <meta head-key="keywords" name="keywords" :content="$page.props.global_settings?.seo_settings?.home_keywords || $page.props.global_settings?.seo_settings?.default_keywords || 'rental mobil mewah bali, sewa alphard bali, rental porsche bali'" />
+        
+        <meta head-key="og:title" property="og:title" :content="($page.props.global_settings?.seo_settings?.home_title || 'Premium Car Rental in Bali') + ' - VINS BALI'" />
+        <meta head-key="og:description" property="og:description" :content="$page.props.global_settings?.seo_settings?.home_description || heroSubtitle" />
+        <meta head-key="og:type" property="og:type" content="website" />
+
+        <meta head-key="twitter:title" name="twitter:title" :content="($page.props.global_settings?.seo_settings?.home_title || 'Premium Car Rental in Bali') + ' - VINS BALI'" />
+        <meta head-key="twitter:description" name="twitter:description" :content="$page.props.global_settings?.seo_settings?.home_description || heroSubtitle" />
+    </Head>
     <FlashMessage />
 
     <!-- STAGE 1: Hero Section & USPs -->

@@ -75,14 +75,14 @@ function destroy(service: { id: number }) {
 </script>
 
 <template>
-    <Head title="Manajemen Layanan" />
+    <Head title="Manajemen Layanan Diskon" />
     <FlashMessage />
 
     <div class="flex flex-col gap-6 p-4">
         <!-- Header -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-foreground">Manajemen Layanan</h1>
+                <h1 class="text-2xl font-bold tracking-tight text-foreground">Manajemen Layanan Diskon</h1>
                 <p class="text-sm text-muted-foreground">Kelola master template paket durasi sewa.</p>
             </div>
             <Button @click="openCreate" class="gap-2">

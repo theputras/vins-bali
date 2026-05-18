@@ -25,11 +25,41 @@ const props = defineProps<{
     relatedCars: Car[];
 }>();
 
+const primaryImage = computed(() => {
+    const primary = props.car.images?.find((img: any) => img.is_primary);
+    return primary ?? props.car.images?.[0] ?? null;
+});
+
+const ogImageUrl = computed(() => {
+    return primaryImage.value ? `/storage/${primaryImage.value.image_path}` : '/images/logo.png';
+});
+
 import { useCurrency } from '@/composables/useCurrency';
 
 // ...
 const page = usePage();
 const { currentCurrency } = useCurrency();
+
+const jsonLd = computed(() => {
+    return {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": props.car.name,
+        "image": ogImageUrl.value,
+        "description": props.car.short_description || props.car.description || `Sewa ${props.car.name} di Bali dengan harga terbaik.`,
+        "brand": {
+            "@type": "Brand",
+            "name": props.car.brand
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": window.location.href,
+            "priceCurrency": "IDR",
+            "price": props.car.price_per_day,
+            "availability": "https://schema.org/InStock"
+        }
+    };
+});
 
 function formatAmount(multiplier: number, discountPercent: number = 0) {
     let basePrice = parseFloat(props.car.price_per_day);
@@ -118,7 +148,25 @@ function openTermsModal() {
 </script>
 
 <template>
-    <Head :title="car.name" />
+    <Head>
+        <title>{{ car.name }}</title>
+        <meta head-key="description" name="description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="keywords" name="keywords" :content="`sewa ${car.name} bali, rental ${car.name} bali, ${car.brand} rental bali, ` + ($page.props.global_settings?.seo_settings?.default_keywords || '')" />
+        
+        <meta head-key="og:title" property="og:title" :content="`${car.name} - VINS BALI`" />
+        <meta head-key="og:description" property="og:description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="og:image" property="og:image" :content="ogImageUrl" />
+        <meta head-key="og:type" property="og:type" content="article" />
+        
+        <meta head-key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta head-key="twitter:title" name="twitter:title" :content="`${car.name} - VINS BALI`" />
+        <meta head-key="twitter:description" name="twitter:description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="twitter:image" name="twitter:image" :content="ogImageUrl" />
+        
+        <component :is="'script'" type="application/ld+json">
+            {{ JSON.stringify(jsonLd) }}
+        </component>
+    </Head>
     <FlashMessage />
 
     <div class="pt-24 pb-16">
