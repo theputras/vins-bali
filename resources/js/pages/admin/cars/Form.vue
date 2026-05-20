@@ -19,12 +19,15 @@ const page = usePage();
 
 const isBrandDropdownOpen = ref(false);
 const brandSearch = ref('');
+const imageErrors = ref<Record<string, boolean>>({});
+
 const filteredBrands = computed(() => {
     const q = brandSearch.value.toLowerCase();
-    return ALL_BRANDS.filter((b) => {
+    const filtered = ALL_BRANDS.filter((b) => {
         if (q && !b.label.toLowerCase().includes(q) && !b.slug.includes(q)) return false;
         return true;
     });
+    return filtered.slice(0, 50);
 });
 
 function selectBrand(brandLabel: string) {
@@ -63,6 +66,9 @@ const form = useForm({
     is_featured: props.car?.is_featured ?? false,
     sort_order: props.car?.sort_order ?? 0,
     images: [] as File[],
+    seo_title: props.car?.seo_title ?? '',
+    seo_keywords: props.car?.seo_keywords ?? '',
+    seo_description: props.car?.seo_description ?? '',
 });
 
 // Preview for new uploads
@@ -234,7 +240,13 @@ const pageTitle = computed(() => props.isEditing ? `Edit: ${props.car?.name}` : 
                                             class="relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
                                             @click="selectBrand(brand.label)"
                                         >
-                                            <img :src="`https://cdn.jsdelivr.net/gh/filippofilip95/car-logos-dataset@master/logos/optimized/${brand.slug}.png`" class="mr-2 h-4 w-auto object-contain" />
+                                            <img 
+                                                v-if="!imageErrors[brand.slug]"
+                                                :src="`https://cdn.jsdelivr.net/gh/filippofilip95/car-logos-dataset@master/logos/optimized/${brand.slug}.png`" 
+                                                class="mr-2 h-4 w-auto object-contain" 
+                                                @error="imageErrors[brand.slug] = true"
+                                                loading="lazy"
+                                            />
                                             {{ brand.label }}
                                             <Check v-if="form.brand === brand.label" class="ml-auto size-4" />
                                         </div>
@@ -577,6 +589,56 @@ const pageTitle = computed(() => props.isEditing ? `Edit: ${props.car?.name}` : 
                                     Baru
                                 </span>
                             </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Pengaturan SEO Mobil -->
+                <Card>
+                    <CardHeader>
+                        <CardTitle class="text-base flex items-center gap-2">
+                            <span class="text-primary font-bold">SEO</span>
+                            Meta Data Mobil
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent class="space-y-4">
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">SEO Title</label>
+                            <input
+                                v-model="form.seo_title"
+                                type="text"
+                                :placeholder="form.name ? `Sewa Mobil ${form.name} Premium di Bali - VINS BALI` : 'Masukkan meta title kustom...'"
+                                class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                :class="{ 'border-destructive': form.errors.seo_title }"
+                            />
+                            <p class="mt-1 text-[11px] text-muted-foreground">Jika dikosongkan, judul akan menggunakan Nama Mobil secara otomatis.</p>
+                            <p v-if="form.errors.seo_title" class="mt-1 text-xs text-destructive">{{ form.errors.seo_title }}</p>
+                        </div>
+
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">SEO Keywords</label>
+                            <input
+                                v-model="form.seo_keywords"
+                                type="text"
+                                :placeholder="form.name ? `sewa ${form.name.toLowerCase()} bali, rental ${form.name.toLowerCase()} bali` : 'keyword1, keyword2...'"
+                                class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                :class="{ 'border-destructive': form.errors.seo_keywords }"
+                            />
+                            <p class="mt-1 text-[11px] text-muted-foreground">Pisahkan dengan koma. Jika kosong, kata kunci default sistem akan digunakan.</p>
+                            <p v-if="form.errors.seo_keywords" class="mt-1 text-xs text-destructive">{{ form.errors.seo_keywords }}</p>
+                        </div>
+
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium">SEO Description</label>
+                            <textarea
+                                v-model="form.seo_description"
+                                rows="3"
+                                :placeholder="form.short_description || 'Masukkan deskripsi kustom untuk hasil pencarian Google...'"
+                                class="w-full rounded-md border border-input bg-background p-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                :class="{ 'border-destructive': form.errors.seo_description }"
+                            ></textarea>
+                            <p class="mt-1 text-[11px] text-muted-foreground">Jika kosong, deskripsi singkat mobil di atas akan digunakan secara otomatis.</p>
+                            <p v-if="form.errors.seo_description" class="mt-1 text-xs text-destructive">{{ form.errors.seo_description }}</p>
                         </div>
                     </CardContent>
                 </Card>

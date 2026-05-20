@@ -24,11 +24,15 @@ use Illuminate\Support\Str;
     'color',
     'is_available',
     'is_featured',
+    'is_rented',
     'sort_order',
     'cars_category_id',
     'horsepower',
     'engine_capacity',
     'acceleration_0_100',
+    'seo_title',
+    'seo_keywords',
+    'seo_description',
 ])]
 class Car extends Model
 {
@@ -93,6 +97,7 @@ class Car extends Model
             'horsepower' => 'integer',
             'is_available' => 'boolean',
             'is_featured' => 'boolean',
+            'is_rented' => 'boolean',
             'sort_order' => 'integer',
         ];
     }

@@ -32,6 +32,10 @@ export interface Car {
     is_available: boolean;
     is_featured: boolean;
     sort_order: number;
+    is_rented: boolean;
+    seo_title?: string;
+    seo_keywords?: string;
+    seo_description?: string;
     formatted_price?: string;
     images?: CarImage[];
     primary_image?: CarImage[];

@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('vbpanel')->name('admin
     Route::resource('services', ServiceController::class)->except(['create', 'show', 'edit']);
     Route::patch('cars/{car}/toggle-availability', [CarController::class, 'toggleAvailability'])
         ->name('cars.toggle-availability');
+    Route::patch('cars/{car}/toggle-rented', [CarController::class, 'toggleRented'])
+        ->name('cars.toggle-rented');
 
     // Car Images
     Route::patch('car-images/{carImage}/set-primary', [CarImageController::class, 'setPrimary'])

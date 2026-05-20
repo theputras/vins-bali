@@ -25,19 +25,23 @@ const props = defineProps<{
     relatedCars: Car[];
 }>();
 
+const page = usePage();
+
 const primaryImage = computed(() => {
     const primary = props.car.images?.find((img: any) => img.is_primary);
     return primary ?? props.car.images?.[0] ?? null;
 });
 
 const ogImageUrl = computed(() => {
-    return primaryImage.value ? `/storage/${primaryImage.value.image_path}` : '/images/logo.png';
+    return primaryImage.value 
+        ? `/storage/${primaryImage.value.image_path}` 
+        : (page.props.global_settings?.seo_settings?.default_og_image_path 
+            ? `/storage/${page.props.global_settings.seo_settings.default_og_image_path}` 
+            : '/images/logo.png');
 });
 
 import { useCurrency } from '@/composables/useCurrency';
 
-// ...
-const page = usePage();
 const { currentCurrency } = useCurrency();
 
 const jsonLd = computed(() => {
@@ -46,14 +50,14 @@ const jsonLd = computed(() => {
         "@type": "Product",
         "name": props.car.name,
         "image": ogImageUrl.value,
-        "description": props.car.short_description || props.car.description || `Sewa ${props.car.name} di Bali dengan harga terbaik.`,
+        "description": props.car.seo_description || props.car.short_description || props.car.description || `Sewa ${props.car.name} di Bali dengan harga terbaik.`,
         "brand": {
             "@type": "Brand",
             "name": props.car.brand
         },
         "offers": {
             "@type": "Offer",
-            "url": window.location.href,
+            "url": typeof window !== 'undefined' ? window.location.href : '',
             "priceCurrency": "IDR",
             "price": props.car.price_per_day,
             "availability": "https://schema.org/InStock"
@@ -149,18 +153,18 @@ function openTermsModal() {
 
 <template>
     <Head>
-        <title>{{ car.name }}</title>
-        <meta head-key="description" name="description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
-        <meta head-key="keywords" name="keywords" :content="`sewa ${car.name} bali, rental ${car.name} bali, ${car.brand} rental bali, ` + ($page.props.global_settings?.seo_settings?.default_keywords || '')" />
+        <title>{{ car.seo_title || car.name }}</title>
+        <meta head-key="description" name="description" :content="car.seo_description || car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="keywords" name="keywords" :content="car.seo_keywords || (`sewa ${car.name} bali, rental ${car.name} bali, ${car.brand} rental bali, ` + ($page.props.global_settings?.seo_settings?.default_keywords || ''))" />
         
-        <meta head-key="og:title" property="og:title" :content="`${car.name} - VINS BALI`" />
-        <meta head-key="og:description" property="og:description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="og:title" property="og:title" :content="(car.seo_title || car.name) + ' - VINS BALI'" />
+        <meta head-key="og:description" property="og:description" :content="car.seo_description || car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
         <meta head-key="og:image" property="og:image" :content="ogImageUrl" />
         <meta head-key="og:type" property="og:type" content="article" />
         
         <meta head-key="twitter:card" name="twitter:card" content="summary_large_image" />
-        <meta head-key="twitter:title" name="twitter:title" :content="`${car.name} - VINS BALI`" />
-        <meta head-key="twitter:description" name="twitter:description" :content="car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
+        <meta head-key="twitter:title" name="twitter:title" :content="(car.seo_title || car.name) + ' - VINS BALI'" />
+        <meta head-key="twitter:description" name="twitter:description" :content="car.seo_description || car.short_description || (car.description ? car.description.substring(0, 150) : `Sewa ${car.name} di Bali dengan harga terbaik.`)" />
         <meta head-key="twitter:image" name="twitter:image" :content="ogImageUrl" />
         
         <component :is="'script'" type="application/ld+json">
@@ -183,9 +187,14 @@ function openTermsModal() {
                 <div class="lg:col-span-3 space-y-8 min-w-0" data-reveal>
                     <!-- Mobile Title (Visible only on mobile) -->
                     <div class="lg:hidden">
-                        <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
-                            {{ car.brand }}
-                        </span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
+                                {{ car.brand }}
+                            </span>
+                            <span v-if="car.is_rented" class="inline-block rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:text-amber-500 uppercase tracking-wide">
+                                Sedang Disewa
+                            </span>
+                        </div>
                         <h1 class="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                             {{ car.name }}
                         </h1>
@@ -215,6 +224,12 @@ function openTermsModal() {
                                     <span class="text-xs text-muted-foreground ml-1">{{ pkg.period }}</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Rent status notice (Mobile) -->
+                        <div v-if="car.is_rented" class="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3.5 text-xs text-amber-600 dark:text-amber-500 flex items-start gap-2">
+                            <span class="font-semibold uppercase tracking-wider text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded shrink-0">Info</span>
+                            <span>Unit ini sedang disewa. Anda tetap dapat menekan "Sewa Sekarang" untuk memesan/antre jadwal berikutnya.</span>
                         </div>
 
                         <!-- USP Card -->
@@ -302,9 +317,14 @@ function openTermsModal() {
                     <div class="lg:sticky lg:top-24 space-y-6">
                         <div>
                             <!-- Brand badge -->
-                            <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
-                                {{ car.brand }}
-                            </span>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="inline-block rounded-md bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary uppercase tracking-wide">
+                                    {{ car.brand }}
+                                </span>
+                                <span v-if="car.is_rented" class="inline-block rounded-md bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:text-amber-500 uppercase tracking-wide">
+                                    Sedang Disewa
+                                </span>
+                            </div>
 
                             <h1 class="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                                 {{ car.name }}
@@ -327,6 +347,12 @@ function openTermsModal() {
                                     <span class="text-xs text-muted-foreground ml-1">{{ pkg.period }}</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Rent status notice (Desktop) -->
+                        <div v-if="car.is_rented" class="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3.5 text-xs text-amber-600 dark:text-amber-500 flex items-start gap-2">
+                            <span class="font-semibold uppercase tracking-wider text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded shrink-0">Info</span>
+                            <span>Unit ini sedang disewa. Anda tetap dapat menekan "Sewa Sekarang" untuk memesan/antre jadwal berikutnya.</span>
                         </div>
 
                         <!-- CTA Button (desktop: part of sticky panel, mobile: fixed bottom) -->

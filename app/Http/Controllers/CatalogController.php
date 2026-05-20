@@ -31,6 +31,13 @@ class CatalogController extends Controller
             $query->where('brand', $brand);
         }
 
+        // Filter by category
+        if ($category = $request->input('category')) {
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
+            });
+        }
+
         // Filter by transmission
         if ($transmission = $request->input('transmission')) {
             $query->where('transmission', $transmission);
@@ -59,10 +66,14 @@ class CatalogController extends Controller
             ->orderBy('brand')
             ->pluck('brand');
 
+        // Get categories for filter dropdown
+        $categories = \App\Models\CarCategory::orderBy('name')->pluck('name');
+
         return Inertia::render('catalog/Index', [
             'cars' => $cars,
             'brands' => $brands,
-            'filters' => $request->only(['search', 'brand', 'transmission', 'seats', 'sort']),
+            'categories' => $categories,
+            'filters' => $request->only(['search', 'brand', 'category', 'transmission', 'seats', 'sort']),
         ]);
     }
 

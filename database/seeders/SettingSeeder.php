@@ -52,6 +52,21 @@ class SettingSeeder extends Seeder
                 ['slug' => 'mclaren', 'label' => 'McLaren'],
                 ['slug' => 'audi', 'label' => 'Audi'],
             ]),
+            'founder_name' => 'I Putu Vinso',
+            'founder_title' => 'Pendiri & CEO VINS BALI',
+            'founder_text' => 'Selamat datang di VINS BALI. Kami berkomitmen untuk menyajikan pengalaman berkendara mewah dan tak terlupakan di Pulau Dewata. Seluruh armada kami dirawat dengan standar keamanan tertinggi demi menjamin kenyamanan perjalanan Anda selama di Bali. Terima kasih telah mempercayakan perjalanan berharga Anda bersama layanan VIP kami.',
+            'founder_photo_path' => '',
+            'home_faqs' => json_encode([
+                ['question' => 'Apakah penyewaan mobil bisa lepas kunci?', 'answer' => 'Ya, kami menyediakan opsi sewa mobil lepas kunci (self-drive) maupun sewa mobil dengan supir premium untuk menjamin kenyamanan perjalanan Anda di Bali.'],
+                ['question' => 'Bagaimana cara konfirmasi dokumen persyaratan sewa?', 'answer' => 'Setelah memilih unit mobil, tim VIP kami akan menghubungi Anda melalui WhatsApp untuk mengonfirmasi foto dokumen persyaratan (seperti Paspor/KTP dan SIM). Proses ini sangat cepat dan praktis tanpa birokrasi berbelit.'],
+                ['question' => 'Apakah pengantaran mobil ke bandara gratis?', 'answer' => 'Ya! Layanan pengantaran dan penjemputan unit mobil di Bandara Internasional I Gusti Ngurah Rai (DPS) serta wilayah utama di Bali (Seminyak, Kuta, Nusa Dua, dll) sepenuhnya gratis.'],
+                ['question' => 'Bagaimana sistem asuransi kendaraan?', 'answer' => 'Semua armada kami sudah dilengkapi dengan asuransi dasar. Anda dapat meningkatkan ke perlindungan penuh (Full Coverage) saat serah terima unit jika membutuhkan rasa aman ekstra.']
+            ]),
+            'home_testimonials' => json_encode([
+                ['name' => 'Rian Wijaya', 'rating' => 5, 'review' => 'Pelayanan VINS BALI luar biasa! Sewa Porsche Boxster lepas kunci, kondisi mobil sangat bersih dan mulus seperti baru. Proses serah terima di Bandara cepat sekali.'],
+                ['name' => 'Sarah Connor', 'rating' => 5, 'review' => 'Very professional luxury car rental in Bali. We booked an Alphard with a driver. The driver was extremely polite, spoke good English, and knew all the best spots.'],
+                ['name' => 'Andi Pratama', 'rating' => 5, 'review' => 'Sangat direkomendasikan untuk sewa mobil mewah di Bali. Tanpa deposit ribet, respon WhatsApp admin sangat cepat bahkan di malam hari.']
+            ]),
         ];
 
         foreach ($settings as $key => $value) {

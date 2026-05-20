@@ -17,7 +17,7 @@ class SettingController extends Controller
     public function index(): Response
     {
         $settings = Setting::pluck('value', 'key')->toArray();
-        $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
+        $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings', 'home_faqs', 'home_testimonials'];
         
         foreach ($jsonKeys as $k) {
             if (isset($settings[$k])) {
@@ -60,11 +60,45 @@ class SettingController extends Controller
             'rental_requirements' => ['nullable', 'array'],
             'home_brand_logos' => ['nullable', 'array'],
             'seo_settings' => ['nullable', 'array'],
+            'favicon' => ['nullable', 'image', 'mimes:ico,png,jpg,jpeg,svg', 'max:2048'],
+            'default_og_image' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:5120'],
             'home_hero_title' => ['required', 'string', 'max:255'],
             'home_hero_highlight' => ['required', 'string', 'max:255'],
             'home_hero_subtitle' => ['required', 'string', 'max:1000'],
             'rental_requirements_footer' => ['required', 'string', 'max:1000'],
+            'home_faqs' => ['nullable', 'array'],
+            'home_testimonials' => ['nullable', 'array'],
+            'founder_name' => ['nullable', 'string', 'max:255'],
+            'founder_title' => ['nullable', 'string', 'max:255'],
+            'founder_text' => ['nullable', 'string', 'max:5000'],
+            'founder_photo' => ['nullable', 'image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
         ]);
+
+        $seoSettings = $validated['seo_settings'] ?? [];
+
+        if ($request->hasFile('favicon')) {
+            $path = $request->file('favicon')->store('settings', 'public');
+            $seoSettings['favicon_path'] = $path;
+        }
+
+        if ($request->hasFile('default_og_image')) {
+            $path = $request->file('default_og_image')->store('settings', 'public');
+            $seoSettings['default_og_image_path'] = $path;
+        }
+
+        $validated['seo_settings'] = $seoSettings;
+
+        unset($validated['favicon']);
+        unset($validated['default_og_image']);
+
+        if ($request->hasFile('founder_photo')) {
+            $path = $request->file('founder_photo')->store('settings', 'public');
+            Setting::updateOrCreate(
+                ['key' => 'founder_photo_path'],
+                ['value' => $path]
+            );
+        }
+        unset($validated['founder_photo']);
 
         foreach ($validated as $key => $value) {
             $formattedValue = is_array($value) ? json_encode($value) : ($value ?? '');

@@ -76,6 +76,14 @@ const formattedPrice = computed(() => {
             >
                 Unggulan
             </span>
+
+            <!-- Rented badge -->
+            <span
+                v-if="car.is_rented"
+                class="absolute bottom-3 left-3 rounded-md bg-amber-600/95 px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider shadow-lg shadow-black/20 backdrop-blur-sm"
+            >
+                Sedang Disewa
+            </span>
         </div>
 
         <!-- Info -->

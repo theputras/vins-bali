@@ -49,7 +49,7 @@ class HandleInertiaRequests extends Middleware
             'global_settings' => function () {
                 return \Illuminate\Support\Facades\Cache::rememberForever('global_settings', function () {
                     $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
-                    $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
+                    $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings', 'home_faqs', 'home_testimonials'];
                     foreach ($jsonKeys as $k) {
                         if (isset($settings[$k])) {
                             $decoded = @json_decode($settings[$k], true);

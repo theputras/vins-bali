@@ -4,6 +4,28 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        @php
+            $settings = \Illuminate\Support\Facades\Cache::rememberForever('global_settings', function () {
+                $settings = \App\Models\Setting::pluck('value', 'key')->toArray();
+                $jsonKeys = ['terms_and_conditions', 'home_usps', 'home_services', 'rental_requirements', 'home_brand_logos', 'seo_settings'];
+                foreach ($jsonKeys as $k) {
+                    if (isset($settings[$k])) {
+                        $decoded = @json_decode($settings[$k], true);
+                        if (json_last_error() === JSON_ERROR_NONE) {
+                            $settings[$k] = $decoded;
+                        }
+                    }
+                }
+                return $settings;
+            });
+            $seoSettings = $settings['seo_settings'] ?? [];
+            $faviconUrl = !empty($seoSettings['favicon_path']) ? asset('storage/' . $seoSettings['favicon_path']) : asset('images/logo.png');
+        @endphp
+
+        @if(!empty($seoSettings['google_verification_code']))
+            <meta name="google-site-verification" content="{{ $seoSettings['google_verification_code'] }}" />
+        @endif
+
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
@@ -15,8 +37,8 @@
             }
         </style>
 
-        <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
-        <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}" type="image/png">
+        <link rel="icon" href="{{ $faviconUrl }}" type="image/png">
+        <link rel="apple-touch-icon" href="{{ $faviconUrl }}" type="image/png">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600|inter:400,500,600,700" rel="stylesheet" />
@@ -25,6 +47,10 @@
         <x-inertia::head>
             <title>{{ config('app.name', 'Laravel') }}</title>
         </x-inertia::head>
+
+        @if(!request()->is('vbpanel*') && !empty($seoSettings['google_analytics_script']))
+            {!! $seoSettings['google_analytics_script'] !!}
+        @endif
     </head>
     <body class="font-sans antialiased {{ request()->is('vbpanel*') ? 'notranslate' : '' }}">
         <x-inertia::app />

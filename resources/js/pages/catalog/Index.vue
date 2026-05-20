@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { ArrowRight, Search, SlidersHorizontal, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import CarCard from '@/components/CarCard.vue';
@@ -9,6 +9,8 @@ import { useScrollReveal } from '@/composables/useScrollReveal';
 import type { Car } from '@/types';
 
 useScrollReveal();
+
+const page = usePage();
 
 interface PaginatedCars {
     data: Car[];
@@ -22,9 +24,11 @@ interface PaginatedCars {
 const props = defineProps<{
     cars: PaginatedCars;
     brands: string[];
+    categories: string[];
     filters: {
         search?: string;
         brand?: string;
+        category?: string;
         transmission?: string;
         seats?: string;
         sort?: string;
@@ -33,6 +37,7 @@ const props = defineProps<{
 
 const search = ref(props.filters.search ?? '');
 const brand = ref(props.filters.brand ?? '');
+const category = ref(props.filters.category ?? '');
 const transmission = ref(props.filters.transmission ?? '');
 const seats = ref(props.filters.seats ?? '');
 const sort = ref(props.filters.sort ?? 'default');
@@ -40,7 +45,7 @@ const sort = ref(props.filters.sort ?? 'default');
 const showFilters = ref(false);
 
 const hasActiveFilters = computed(() => {
-    return brand.value || transmission.value || seats.value || sort.value !== 'default';
+    return brand.value || category.value || transmission.value || seats.value || sort.value !== 'default';
 });
 
 let searchTimeout: ReturnType<typeof setTimeout>;
@@ -49,6 +54,7 @@ function applyFilters() {
     const params: Record<string, string> = {};
     if (search.value) params.search = search.value;
     if (brand.value) params.brand = brand.value;
+    if (category.value) params.category = category.value;
     if (transmission.value) params.transmission = transmission.value;
     if (seats.value) params.seats = seats.value;
     if (sort.value && sort.value !== 'default') params.sort = sort.value;
@@ -62,6 +68,7 @@ function applyFilters() {
 function clearFilters() {
     search.value = '';
     brand.value = '';
+    category.value = '';
     transmission.value = '';
     seats.value = '';
     sort.value = 'default';
@@ -73,23 +80,60 @@ watch(search, () => {
     searchTimeout = setTimeout(applyFilters, 400);
 });
 
-watch([brand, transmission, seats, sort], () => {
+watch([brand, category, transmission, seats, sort], () => {
     applyFilters();
+});
+
+const dynamicSeoTitle = computed(() => {
+    if (brand.value) {
+        return `Sewa Mobil ${brand.value} Premium di Bali - VINS BALI`;
+    }
+    if (category.value) {
+        return `Sewa Mobil ${category.value} Premium di Bali - VINS BALI`;
+    }
+    return page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil';
+});
+
+const dynamicSeoDescription = computed(() => {
+    if (brand.value) {
+        return `Temukan koleksi mobil mewah ${brand.value} terbaik untuk disewa di Bali. Pelayanan VIP, kondisi prima, harga bersaing. Hubungi Vins Bali sekarang!`;
+    }
+    if (category.value) {
+        return `Sewa mobil kategori ${category.value.toLowerCase()} kelas premium/eksklusif di Bali. Berkendara nyaman & stylish dengan armada terbaik Vins Bali.`;
+    }
+    return page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.';
+});
+
+const dynamicSeoKeywords = computed(() => {
+    const defaultKeywords = page.props.global_settings?.seo_settings?.catalog_keywords || page.props.global_settings?.seo_settings?.default_keywords || 'katalog mobil bali, harga sewa mobil bali';
+    if (brand.value) {
+        return `sewa mobil ${brand.value.toLowerCase()} bali, rental ${brand.value.toLowerCase()} bali, luxury ${brand.value.toLowerCase()} rental bali, ${defaultKeywords}`;
+    }
+    if (category.value) {
+        return `sewa mobil ${category.value.toLowerCase()} bali, rental mobil ${category.value.toLowerCase()} bali, premium ${category.value.toLowerCase()} bali, ${defaultKeywords}`;
+    }
+    return defaultKeywords;
 });
 </script>
 
 <template>
     <Head>
-        <title>{{ $page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil' }}</title>
-        <meta head-key="description" name="description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
-        <meta head-key="keywords" name="keywords" :content="$page.props.global_settings?.seo_settings?.catalog_keywords || $page.props.global_settings?.seo_settings?.default_keywords || 'katalog mobil bali, harga sewa mobil bali'" />
+        <title>{{ dynamicSeoTitle }}</title>
+        <meta head-key="description" name="description" :content="dynamicSeoDescription" />
+        <meta head-key="keywords" name="keywords" :content="dynamicSeoKeywords" />
         
-        <meta head-key="og:title" property="og:title" :content="($page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil') + ' - VINS BALI'" />
-        <meta head-key="og:description" property="og:description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
+        <meta head-key="og:title" property="og:title" :content="dynamicSeoTitle" />
+        <meta head-key="og:description" property="og:description" :content="dynamicSeoDescription" />
+        <meta head-key="og:image" property="og:image" :content="page.props.global_settings?.seo_settings?.default_og_image_path ? '/storage/' + page.props.global_settings.seo_settings.default_og_image_path : '/images/logo.png'" />
         <meta head-key="og:type" property="og:type" content="website" />
+        <meta head-key="og:site_name" property="og:site_name" :content="page.props.global_settings?.seo_settings?.site_name || 'VINS BALI'" />
+        <meta head-key="og:locale" property="og:locale" :content="page.props.global_settings?.seo_settings?.og_locale || 'id_ID'" />
 
-        <meta head-key="twitter:title" name="twitter:title" :content="($page.props.global_settings?.seo_settings?.catalog_title || 'Katalog Mobil') + ' - VINS BALI'" />
-        <meta head-key="twitter:description" name="twitter:description" :content="$page.props.global_settings?.seo_settings?.catalog_description || 'Temukan mobil impian Anda dari koleksi premium kami di Vins Bali.'" />
+        <meta head-key="twitter:card" name="twitter:card" content="summary_large_image" />
+        <meta head-key="twitter:site" name="twitter:site" :content="page.props.global_settings?.seo_settings?.twitter_handle" />
+        <meta head-key="twitter:title" name="twitter:title" :content="dynamicSeoTitle" />
+        <meta head-key="twitter:description" name="twitter:description" :content="dynamicSeoDescription" />
+        <meta head-key="twitter:image" name="twitter:image" :content="page.props.global_settings?.seo_settings?.default_og_image_path ? '/storage/' + page.props.global_settings.seo_settings.default_og_image_path : '/images/logo.png'" />
     </Head>
     <FlashMessage />
 
@@ -165,7 +209,7 @@ watch([brand, transmission, seats, sort], () => {
                     leave-to-class="opacity-0 -translate-y-2"
                 >
                     <div v-if="showFilters" class="rounded-xl border border-border bg-card p-4">
-                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
                             <!-- Brand -->
                             <div>
                                 <label class="mb-1.5 block text-xs font-medium text-muted-foreground">Merk</label>
@@ -175,6 +219,18 @@ watch([brand, transmission, seats, sort], () => {
                                 >
                                     <option value="">Semua Merk</option>
                                     <option v-for="b in brands" :key="b" :value="b">{{ b }}</option>
+                                </select>
+                            </div>
+
+                            <!-- Kategori -->
+                            <div>
+                                <label class="mb-1.5 block text-xs font-medium text-muted-foreground">Kategori</label>
+                                <select
+                                    v-model="category"
+                                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                >
+                                    <option value="">Semua Kategori</option>
+                                    <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
                                 </select>
                             </div>
 

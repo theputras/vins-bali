@@ -46,6 +46,9 @@ class CarStoreRequest extends FormRequest
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'images' => ['nullable', 'array', 'max:10'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:20480'], // 20MB max, auto-compressed by system
+            'seo_title' => ['nullable', 'string', 'max:255'],
+            'seo_keywords' => ['nullable', 'string', 'max:500'],
+            'seo_description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 

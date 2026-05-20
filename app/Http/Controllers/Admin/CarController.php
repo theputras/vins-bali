@@ -166,6 +166,20 @@ class CarController extends Controller
     }
 
     /**
+     * Toggle the rented status of the specified car.
+     */
+    public function toggleRented(Car $car): RedirectResponse
+    {
+        $car->update(['is_rented' => ! $car->is_rented]);
+
+        $this->clearHomeCache();
+
+        $status = $car->is_rented ? 'sedang disewa' : 'tersedia';
+
+        return back()->with('success', "Status sewa mobil \"{$car->name}\" diubah menjadi {$status}.");
+    }
+
+    /**
      * Update the display order of multiple cars.
      */
     public function updateOrder(Request $request): RedirectResponse
