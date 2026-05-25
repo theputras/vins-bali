@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Car, LayoutGrid, Settings, Users, Settings2 } from 'lucide-vue-next';
+import { Car, LayoutGrid, Settings, Users, Settings2, ClipboardList } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -25,6 +25,11 @@ const mainNavItems: NavItem[] = [
         title: 'Manajemen Mobil',
         href: '/vbpanel/cars',
         icon: Car,
+    },
+    {
+        title: 'Manajemen Pesanan',
+        href: '/vbpanel/bookings',
+        icon: ClipboardList,
     },
     {
         title: 'Manajemen User',

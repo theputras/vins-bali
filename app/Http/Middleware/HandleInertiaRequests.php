@@ -69,6 +69,24 @@ class HandleInertiaRequests extends Middleware
                     return 0.000063; // Fallback rate
                 }
             }),
+            'unread_notifications' => function () use ($request) {
+                $user = $request->user();
+                if ($user && $user->role === 'admin') {
+                    return $user->unreadNotifications()
+                        ->where('type', 'App\Notifications\NewBookingNotification')
+                        ->latest()
+                        ->take(10)
+                        ->get()
+                        ->map(function ($notification) {
+                            return [
+                                'id' => $notification->id,
+                                'data' => $notification->data,
+                                'created_at' => $notification->created_at->diffForHumans(),
+                            ];
+                        });
+                }
+                return [];
+            },
         ];
     }
 }

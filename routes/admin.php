@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'admin'])->prefix('vbpanel')->name('admin-panel.')->group(function () {
@@ -19,8 +20,6 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('vbpanel')->name('admin
     Route::resource('services', ServiceController::class)->except(['create', 'show', 'edit']);
     Route::patch('cars/{car}/toggle-availability', [CarController::class, 'toggleAvailability'])
         ->name('cars.toggle-availability');
-    Route::patch('cars/{car}/toggle-rented', [CarController::class, 'toggleRented'])
-        ->name('cars.toggle-rented');
 
     // Car Images
     Route::patch('car-images/{carImage}/set-primary', [CarImageController::class, 'setPrimary'])
@@ -35,7 +34,15 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('vbpanel')->name('admin
     Route::patch('users/{user}/toggle-role', [UserController::class, 'toggleRole'])
         ->name('users.toggle-role');
 
+    // Bookings Management
+    Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::patch('bookings/{booking}/status', [BookingController::class, 'updateStatus'])
+        ->name('bookings.update-status');
+    Route::post('bookings/mark-read', [BookingController::class, 'markNotificationsRead'])
+        ->name('bookings.mark-read');
+
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 });
+

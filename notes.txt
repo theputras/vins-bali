@@ -1,0 +1,50 @@
+================================================================================
+CATATAN SEO VINS BALI: ELEMEN YANG BELUM BISA DI-CUSTOM VIA FRONTEND (ADMIN)
+================================================================================
+
+Berikut adalah daftar elemen SEO di seluruh halaman website Vins Bali yang saat ini 
+masih bersifat OTOMATIS/STATIS (belum memiliki input pengeditan khusus di Admin Panel / Settings):
+
+--------------------------------------------------------------------------------
+1. HALAMAN DETAIL MOBIL (/catalog/{slug})
+--------------------------------------------------------------------------------
+Halaman ini sangat krusial karena merupakan ujung tombak pencarian tipe mobil spesifik.
+Saat ini:
+*   [ ] SEO Title (Meta Title): Belum bisa di-custom secara mandiri.
+        -> Saat ini otomatis menggunakan Nama Mobil (contoh: "Porsche 911 Carrera"). 
+        -> Admin tidak bisa mengubah meta title secara spesifik demi SEO (misal: "Sewa Porsche 911 Murah di Bali | VINS BALI").
+*   [ ] SEO Keywords (Meta Keywords): Belum ada kolom input manual khusus untuk mobil tersebut.
+        -> Saat ini otomatis men-generate: "sewa [nama] bali, rental [nama] bali, [brand] rental bali".
+*   [ ] SEO Description (Meta Description): Menggunakan "Deskripsi Singkat" mobil.
+        -> Belum memiliki kolom khusus "SEO Description" terpisah yang terisolasi dari deskripsi tampilan web.
+
+--------------------------------------------------------------------------------
+2. HALAMAN PENCARIAN & KATEGORI SPESIFIK (/catalog?brand=... atau category=...)
+--------------------------------------------------------------------------------
+Saat ini jika pengunjung memfilter katalog berdasarkan Brand atau Kategori tertentu (misal: Sedan):
+*   [ ] Dynamic SEO Title & Description: Belum menyesuaikan filter secara dinamis di level SEO.
+        -> Saat ini meta title dan deskripsinya masih memakai pengaturan SEO umum halaman Katalog (/catalog).
+        -> Idealnya: Jika filter Sedan aktif, SEO Title berganti menjadi "Sewa Mobil Sedan Premium di Bali - VINS BALI".
+
+--------------------------------------------------------------------------------
+3. INTEGRASI & VERIFIKASI MESIN PENCARI (GOOGLE SEARCH CONSOLE / ANALYTICS)
+--------------------------------------------------------------------------------
+Untuk mendaftarkan website ke mesin pencari Google/Bing/Yahoo:
+*   [ ] Google Verification Tag: Belum ada input kode verifikasi di Settings.
+        -> Contoh tag: <meta name="google-site-verification" content="XYZ..." />
+        -> Saat ini jika ingin melakukan verifikasi domain, developer harus mengedit file kode HTML secara manual.
+*   [ ] Script Google Analytics / GTM: Belum ada kolom khusus di Admin untuk memasang script pelacakan lalu lintas pengunjung secara instan.
+
+--------------------------------------------------------------------------------
+4. ASET KOSMETIK SEO (FAVICON & OG:IMAGE DEFAULT)
+--------------------------------------------------------------------------------
+*   [ ] Favicon Upload: Belum bisa di-upload via Admin Settings.
+        -> Masih menggunakan file fisik statis di folder `public/favicon.ico`.
+*   [ ] Default Share Image (OG:Image): Belum ada pengaturan upload gambar utama untuk share link website.
+        -> Jika link utama "vinsbali.com" di-share ke WhatsApp/Facebook, ia menggunakan gambar default statis `/images/logo.png` bawaan sistem.
+
+================================================================================
+💡 REKOMENDASI TAHAP SELANJUTNYA:
+Jika Anda ingin memaksimalkan dominasi SEO Vins Bali, kita bisa mencicil pembuatan 
+fitur-fitur input di atas di menu Admin Panel secara bertahap!
+================================================================================

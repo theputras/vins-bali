@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -14,6 +15,10 @@ Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'ind
 // Catalog
 Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/catalog/{slug}', [CatalogController::class, 'show'])->name('catalog.show');
+
+// Bookings (public)
+Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
+Route::get('/booking/thank-you', [BookingController::class, 'thankyou'])->name('booking.thankyou');
 
 // ─── Authenticated Routes ────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {

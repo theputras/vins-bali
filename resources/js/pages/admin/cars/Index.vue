@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Edit, Eye, EyeOff, Plus, Search, Trash2, X, Tag, CalendarClock } from 'lucide-vue-next';
+import { Edit, Eye, EyeOff, Plus, Search, Trash2, X, Tag } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import FlashMessage from '@/components/FlashMessage.vue';
@@ -68,12 +68,6 @@ function onSearchInput() {
 
 function toggleAvailability(car: Car) {
     router.patch(`/vbpanel/cars/${car.id}/toggle-availability`, {}, {
-        preserveScroll: true,
-    });
-}
-
-function toggleRented(car: Car) {
-    router.patch(`/vbpanel/cars/${car.id}/toggle-rented`, {}, {
         preserveScroll: true,
     });
 }
@@ -266,9 +260,6 @@ function deleteCategory(category: { id: number }) {
                                         >
                                             {{ car.is_available ? 'Tersedia' : 'Tidak Tersedia' }}
                                         </Badge>
-                                        <Badge v-if="car.is_rented" variant="outline" class="text-[10px] bg-amber-500/15 text-amber-600 border-amber-500/30 font-medium">
-                                            Sedang Disewa
-                                        </Badge>
                                         <Badge v-if="car.is_featured" variant="secondary" class="text-[10px]">
                                             Unggulan
                                         </Badge>
@@ -292,16 +283,6 @@ function deleteCategory(category: { id: number }) {
                                         >
                                             <EyeOff v-if="car.is_available" class="size-4" />
                                             <Eye v-else class="size-4" />
-                                        </Button>
-
-                                        <Button
-                                            variant="ghost"
-                                            size="icon-sm"
-                                            @click="toggleRented(car)"
-                                            :title="car.is_rented ? 'Tandai Tersedia (Batal Sewa)' : 'Tandai Sedang Disewa'"
-                                            :class="car.is_rented ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-500/10' : 'text-muted-foreground'"
-                                        >
-                                            <CalendarClock class="size-4" />
                                         </Button>
 
                                         <!-- Delete Dialog -->

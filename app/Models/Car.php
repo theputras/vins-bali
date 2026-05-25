@@ -24,7 +24,6 @@ use Illuminate\Support\Str;
     'color',
     'is_available',
     'is_featured',
-    'is_rented',
     'sort_order',
     'cars_category_id',
     'horsepower',
@@ -97,7 +96,6 @@ class Car extends Model
             'horsepower' => 'integer',
             'is_available' => 'boolean',
             'is_featured' => 'boolean',
-            'is_rented' => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -136,6 +134,14 @@ class Car extends Model
     public function primaryImage(): HasMany
     {
         return $this->hasMany(CarImage::class)->where('is_primary', true);
+    }
+
+    /**
+     * Get all bookings for this car.
+     */
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
     }
 
     // ─── Scopes ──────────────────────────────────────────────────

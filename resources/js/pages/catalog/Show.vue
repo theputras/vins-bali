@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, useForm } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, CheckCircle, FileText, Fuel, MessageCircle, Palette, Settings2, Users, Zap, Gauge, Timer } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import FlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 import CarCard from '@/components/CarCard.vue';
 import CarGallery from '@/components/CarGallery.vue';
 import FlashMessage from '@/components/FlashMessage.vue';
@@ -108,13 +110,6 @@ const pricePackages = computed(() => {
     return [...base, ...dynamicPacks];
 });
 
-const proceedToWhatsApp = () => {
-    const waNumber = page.props.global_settings?.whatsapp_number || '';
-    const text = encodeURIComponent(`Hello VINS Bali, I wanna rent ${props.car.name}`);
-    window.open(`https://wa.me/${waNumber}?text=${text}`, '_blank');
-    showTermsModal.value = false;
-};
-
 const specs = computed(() => {
     const arr: any[] = [
         { icon: Settings2, label: 'Transmisi', value: props.car.transmission },
@@ -132,6 +127,7 @@ const specs = computed(() => {
 // S&K Modal state
 const showTermsModal = ref(false);
 const agreedToTerms = ref(false);
+const modalStep = ref<'terms' | 'form'>('terms');
 
 const termsAndConditions = computed<string[]>(() => {
     const data = page.props.global_settings?.terms_and_conditions;
@@ -145,9 +141,37 @@ const usps = computed(() => {
 
 const activeTab = ref<'specifications' | 'terms'>('specifications');
 
+// Booking form
+const bookingForm = useForm({
+    car_id: props.car.id,
+    customer_name: '',
+    customer_phone: '',
+    rental_date: '',
+});
+
+const flatpickrConfig = {
+    mode: 'range',
+    minDate: 'today',
+    dateFormat: 'Y-m-d',
+    inline: true,
+};
+
 function openTermsModal() {
     agreedToTerms.value = false;
+    modalStep.value = 'terms';
     showTermsModal.value = true;
+}
+
+function proceedToForm() {
+    modalStep.value = 'form';
+}
+
+function submitBooking() {
+    bookingForm.post('/bookings', {
+        onSuccess: () => {
+            showTermsModal.value = false;
+        },
+    });
 }
 </script>
 
@@ -407,58 +431,135 @@ function openTermsModal() {
         </div>
     </div>
 
-    <!-- S&K Modal (popup saat klik "Sewa Sekarang") -->
+    <!-- S&K + Booking Form Modal (popup saat klik "Sewa Sekarang") -->
     <Dialog v-model:open="showTermsModal">
-        <DialogContent class="max-w-lg max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-                <DialogTitle class="flex items-center gap-2">
-                    <FileText class="size-5 text-primary" />
-                    Syarat & Ketentuan Sewa
-                </DialogTitle>
-                <DialogDescription>
-                    Silakan baca dan setujui syarat & ketentuan berikut sebelum melanjutkan ke WhatsApp.
-                </DialogDescription>
-            </DialogHeader>
+        <DialogContent 
+            class="max-w-lg max-h-[85vh] overflow-y-auto"
+            @interact-outside="(e) => {
+                const target = e.target as HTMLElement;
+                if (target?.closest('.flatpickr-calendar')) {
+                    e.preventDefault();
+                }
+            }"
+        >
+            <!-- Step 1: Syarat & Ketentuan -->
+            <template v-if="modalStep === 'terms'">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2">
+                        <FileText class="size-5 text-primary" />
+                        Syarat & Ketentuan Sewa
+                    </DialogTitle>
+                    <DialogDescription>
+                        Silakan baca dan setujui syarat & ketentuan berikut sebelum melanjutkan.
+                    </DialogDescription>
+                </DialogHeader>
 
-            <div class="space-y-4 py-2">
-                <ul v-if="termsAndConditions.length > 0" class="space-y-2 rounded-lg border border-border/50 bg-muted/20 p-4">
-                    <li
-                        v-for="(term, index) in termsAndConditions"
-                        :key="index"
-                        class="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
+                <div class="space-y-4 py-2">
+                    <ul v-if="termsAndConditions.length > 0" class="space-y-2 rounded-lg border border-border/50 bg-muted/20 p-4">
+                        <li
+                            v-for="(term, index) in termsAndConditions"
+                            :key="index"
+                            class="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed"
+                        >
+                            <CheckCircle class="mt-0.5 size-3 shrink-0 text-amber-500" />
+                            {{ term }}
+                        </li>
+                    </ul>
+                    <div v-if="termsAndConditions.length === 0" class="text-sm text-muted-foreground">Syarat dan ketentuan belum diatur.</div>
+                </div>
+
+                <!-- Agreement checkbox -->
+                <label class="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer transition hover:bg-muted/30">
+                    <input
+                        v-model="agreedToTerms"
+                        type="checkbox"
+                        class="mt-0.5 size-4 rounded border-input accent-primary"
+                    />
+                    <span class="text-sm text-foreground">
+                        Saya telah membaca dan <strong>menyetujui</strong> seluruh Syarat & Ketentuan sewa kendaraan VINS BALI.
+                    </span>
+                </label>
+
+                <DialogFooter class="gap-2">
+                    <DialogClose as-child>
+                        <Button variant="outline">Batal</Button>
+                    </DialogClose>
+                    <Button
+                        :disabled="!agreedToTerms"
+                        class="gap-2 bg-red-700 text-white hover:bg-red-800 disabled:opacity-50"
+                        @click="proceedToForm"
                     >
-                        <CheckCircle class="mt-0.5 size-3 shrink-0 text-amber-500" />
-                        {{ term }}
-                    </li>
-                </ul>
-                <div v-if="termsAndConditions.length === 0" class="text-sm text-muted-foreground">Syarat dan ketentuan belum diatur.</div>
-            </div>
+                        Lanjut Isi Data
+                    </Button>
+                </DialogFooter>
+            </template>
 
-            <!-- Agreement checkbox -->
-            <label class="flex items-start gap-3 rounded-lg border border-border p-3 cursor-pointer transition hover:bg-muted/30">
-                <input
-                    v-model="agreedToTerms"
-                    type="checkbox"
-                    class="mt-0.5 size-4 rounded border-input accent-primary"
-                />
-                <span class="text-sm text-foreground">
-                    Saya telah membaca dan <strong>menyetujui</strong> seluruh Syarat & Ketentuan sewa kendaraan VINS BALI.
-                </span>
-            </label>
+            <!-- Step 2: Form Data Diri -->
+            <template v-else-if="modalStep === 'form'">
+                <DialogHeader>
+                    <DialogTitle class="flex items-center gap-2">
+                        <MessageCircle class="size-5 text-primary" />
+                        Data Diri Penyewa
+                    </DialogTitle>
+                    <DialogDescription>
+                        Isi data diri Anda untuk melanjutkan proses sewa <strong>{{ car.name }}</strong>.
+                    </DialogDescription>
+                </DialogHeader>
 
-            <DialogFooter class="gap-2">
-                <DialogClose as-child>
-                    <Button variant="outline">Batal Menyewa</Button>
-                </DialogClose>
-                <Button
-                    :disabled="!agreedToTerms"
-                    class="gap-2 bg-red-700 text-white hover:bg-red-800 disabled:opacity-50"
-                    @click="proceedToWhatsApp"
-                >
-                    <MessageCircle class="size-4" />
-                    Sewa via WhatsApp
-                </Button>
-            </DialogFooter>
+                <form @submit.prevent="submitBooking" class="space-y-4 py-2">
+                    <!-- Nama -->
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-foreground">Nama Lengkap *</label>
+                        <input
+                            v-model="bookingForm.customer_name"
+                            type="text"
+                            placeholder="Masukkan nama lengkap"
+                            required
+                            class="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            :class="{ 'border-destructive': bookingForm.errors.customer_name }"
+                        />
+                        <p v-if="bookingForm.errors.customer_name" class="mt-1 text-xs text-destructive">{{ bookingForm.errors.customer_name }}</p>
+                    </div>
+
+                    <!-- No Telp -->
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-foreground">Nomor Telepon / WhatsApp *</label>
+                        <input
+                            v-model="bookingForm.customer_phone"
+                            type="tel"
+                            placeholder="08xxxxxxxxxx"
+                            required
+                            class="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            :class="{ 'border-destructive': bookingForm.errors.customer_phone }"
+                        />
+                        <p v-if="bookingForm.errors.customer_phone" class="mt-1 text-xs text-destructive">{{ bookingForm.errors.customer_phone }}</p>
+                    </div>
+
+                    <!-- Rencana Tanggal Sewa -->
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-foreground">Rencana Tanggal Sewa *</label>
+                        <FlatPickr
+                            v-model="bookingForm.rental_date"
+                            :config="flatpickrConfig"
+                            class="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                            :class="{ 'border-destructive': bookingForm.errors.rental_date }"
+                        />
+                        <p v-if="bookingForm.errors.rental_date" class="mt-1 text-xs text-destructive">{{ bookingForm.errors.rental_date }}</p>
+                    </div>
+
+                    <DialogFooter class="gap-2 pt-2">
+                        <Button type="button" variant="outline" @click="modalStep = 'terms'">Kembali</Button>
+                        <Button
+                            type="submit"
+                            :disabled="bookingForm.processing"
+                            class="gap-2 bg-red-700 text-white hover:bg-red-800 disabled:opacity-50"
+                        >
+                            <MessageCircle class="size-4" />
+                            {{ bookingForm.processing ? 'Mengirim...' : 'Rental Sekarang' }}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </template>
         </DialogContent>
     </Dialog>
 </template>
